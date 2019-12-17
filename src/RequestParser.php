@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laragraph\LaravelGraphQLUtils;
 
 use GraphQL\Error\InvariantViolation;

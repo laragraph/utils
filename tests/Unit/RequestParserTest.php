@@ -13,7 +13,7 @@ class RequestParserTest extends TestCase
 {
     public function testGetWithQuery(): void
     {
-        $query = '{ foo }';
+        $query = /** @lang GraphQL */ '{ foo }';
         $request = $this->makeRequest('GET', ['query' => $query]);
 
         $parser = new RequestParser();
@@ -23,6 +23,14 @@ class RequestParserTest extends TestCase
         self::assertSame($query, $params->query);
     }
 
+    /**
+     * @param  string  $method
+     * @param  array<mixed>  $parameters
+     * @param  array<mixed>  $files
+     * @param  array<mixed>  $headers
+     * @param  string|resource|null  $content
+     * @return \Illuminate\Http\Request
+     */
     public function makeRequest(string $method, array $parameters = [], array $files = [], array $headers = [], $content = null): Request
     {
         $symfonyRequest = SymfonyRequest::create(

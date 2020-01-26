@@ -37,24 +37,28 @@ class RequestParser
         } else {
             $contentType = $request->header('content-type');
 
-            if (empty($contentType)) {
+            if ('' === $contentType || null === $contentType) {
                 throw new RequestError('Missing "Content-Type" header.');
             }
 
             if ($contentType === 'application/graphql') {
-                $bodyParams = ['query' => $request->getContent()];
+                /** @var string $content */
+                $content = $request->getContent();
+                $bodyParams = ['query' => $content];
             } elseif ($contentType === 'multipart/form-data') {
                 $bodyParams = $this->inlineFiles($request);
             } else {
                 // In all other cases, we assume we are given JSON encoded input
-                $bodyParams = \Safe\json_decode($request->getContent(), true);
+                /** @var string $content */
+                $content = $request->getContent();
+                $bodyParams = \Safe\json_decode($content, true);
             }
         }
 
         return $this->helper->parseRequestParams(
             $request->getMethod(),
             $bodyParams,
-            $request->query()
+            $request->all()
         );
     }
 
@@ -66,7 +70,9 @@ class RequestParser
      */
     protected function inlineFiles(Request $request): array
     {
-        $jsonInput = \Safe\json_decode($request->getContent(), true);
+        /** @var string $content */
+        $content = $request->getContent();
+        $jsonInput = \Safe\json_decode($content, true);
 
         if (! isset($jsonInput['map'])) {
             throw new InvariantViolation(

@@ -35,11 +35,8 @@ class RequestParser
         if ($request->isMethod('GET')) {
             $bodyParams = [];
         } else {
+            // Symfony defaults to 'application/x-www-form-urlencoded' for POST requests
             $contentType = $request->header('content-type');
-
-            if ('' === $contentType || null === $contentType) {
-                throw new RequestError('Missing "Content-Type" header.');
-            }
 
             if ($contentType === 'application/graphql') {
                 /** @var string $content */

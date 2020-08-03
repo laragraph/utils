@@ -26,7 +26,7 @@ class RequestParser
     /**
      * Converts an incoming HTTP request to one or more OperationParams.
      *
-     * @return OperationParams[]|OperationParams
+     * @return OperationParams|array<int, OperationParams>
      *
      * @throws RequestError
      */
@@ -66,7 +66,7 @@ class RequestParser
      * Inline file uploads given through a multipart request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return mixed[]
+     * @return array<mixed>
      */
     protected function inlineFiles(Request $request): array
     {
@@ -82,11 +82,10 @@ class RequestParser
 
         $bodyParams = $jsonInput['operations'];
 
-        /**
-         * @var string
-         * @var string[] $operationsPaths
-         */
         foreach ($jsonInput['map'] as $fileKey => $operationsPaths) {
+            /** @var string $fileKey */
+            /** @var array<string> $operationsPaths */
+
             $file = $request->file($fileKey);
 
             /** @var string $operationsPath */

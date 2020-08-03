@@ -85,7 +85,6 @@ class RequestParser
         foreach ($jsonInput['map'] as $fileKey => $operationsPaths) {
             /** @var string $fileKey */
             /** @var array<string> $operationsPaths */
-
             $file = $request->file($fileKey);
 
             /** @var string $operationsPath */

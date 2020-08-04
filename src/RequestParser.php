@@ -33,9 +33,9 @@ class RequestParser
      */
     public function parseRequest(Request $request)
     {
-        $method     = $request->getMethod();
+        $method = $request->getMethod();
         $bodyParams = [];
-        $queryParams  = $request->query();
+        $queryParams = $request->query();
 
         if ($method === 'POST') {
             $contentType = $request->header('Content-Type');
@@ -51,7 +51,7 @@ class RequestParser
 
                 if (! is_array($bodyParams)) {
                     throw new RequestError(
-                        'GraphQL Server expects JSON object or array, but got ' .
+                        'GraphQL Server expects JSON object or array, but got '.
                         Utils::printSafeJson($bodyParams)
                     );
                 }
@@ -60,7 +60,7 @@ class RequestParser
             } elseif (stripos($contentType, 'multipart/form-data') !== false) {
                 $bodyParams = $this->inlineFiles($request);
             } else {
-                throw new RequestError('Unexpected content type: ' . Utils::printSafeJson($contentType));
+                throw new RequestError('Unexpected content type: '.Utils::printSafeJson($contentType));
             }
         }
 

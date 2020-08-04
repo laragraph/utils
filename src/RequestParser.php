@@ -67,19 +67,19 @@ class RequestParser
      */
     protected function inlineFiles(Request $request): array
     {
-        /** @var string $content */
-        $content = $request->getContent();
-        $jsonInput = \Safe\json_decode($content, true);
-
-        if (! isset($jsonInput['map'])) {
+        if (! $request->has('map')) {
             throw new InvariantViolation(
                 'Could not find a valid map, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec'
             );
         }
 
-        $bodyParams = $jsonInput['operations'];
+        /** @var array<string, mixed>|array<int, array<string, mixed>> $operations */
+        $operations = \Safe\json_decode($request->input('operations'), true);
 
-        foreach ($jsonInput['map'] as $fileKey => $operationsPaths) {
+        /** @var array<string, array<int, string>> $map */
+        $map = \Safe\json_decode($request->input('map'), true);
+
+        foreach ($map as $fileKey => $operationsPaths) {
             /** @var string $fileKey */
             /** @var array<string> $operationsPaths */
             $file = $request->file($fileKey);
@@ -90,6 +90,6 @@ class RequestParser
             }
         }
 
-        return $bodyParams;
+        return $operations;
     }
 }

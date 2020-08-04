@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Laragraph\LaravelGraphQLUtils\Tests\Unit;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Laragraph\LaravelGraphQLUtils\RequestParser;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -68,6 +69,47 @@ class RequestParserTest extends TestCase
         $params = $parser->parseRequest($request);
 
         self::assertSame(null, $params->query);
+    }
+
+    public function testMultipartFormRequest(): void
+    {
+        $file = UploadedFile::fake()->create('image.jpg', 500);
+
+        $request = $this->makeRequest(
+            'POST',
+            [
+                'operations' => /** @lang JSON */ '
+                    {
+                        "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
+                        "variables": {
+                            "file": null
+                        }
+                    }
+                ',
+                'map' => /** @lang JSON */ '
+                    {
+                        "0": ["variables.file"]
+                    }
+                ',
+            ],
+            [
+                '0' => $file,
+            ],
+            [
+                'Content-Type' => 'multipart/form-data',
+            ]
+        );
+
+        $parser = new RequestParser();
+        /** @var \GraphQL\Server\OperationParams $params */
+        $params = $parser->parseRequest($request);
+
+        self::assertSame('mutation Upload($file: Upload!) { upload(file: $file) }', $params->query);
+
+        $variables = $params->variables;
+        self::assertNotNull($variables);
+        /** @var array<string, mixed> $variables */
+        self::assertSame($file, $variables['file']);
     }
 
     /**

@@ -1,9 +1,9 @@
 includes:
-	- vendor/phpstan/phpstan/conf/bleedingEdge.neon
-	- vendor/phpstan/phpstan/conf/config.levelmax.neon
+- vendor/phpstan/phpstan/conf/bleedingEdge.neon
 parameters:
+	level: max
 	inferPrivatePropertyTypeFromConstructor: true
 	paths:
-		- src
-		- tests
+	- src
+	- tests
 	tmpDir: %currentWorkingDirectory%/.build/phpstan

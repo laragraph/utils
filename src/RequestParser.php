@@ -8,6 +8,7 @@ use GraphQL\Error\InvariantViolation;
 use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
+use GraphQL\Utils\Utils;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
@@ -32,31 +33,38 @@ class RequestParser
      */
     public function parseRequest(Request $request)
     {
-        if ($request->isMethod('GET')) {
-            $bodyParams = [];
-        } else {
-            // Symfony defaults to 'application/x-www-form-urlencoded' for POST requests
-            $contentType = $request->header('content-type');
+        $method     = $request->getMethod();
+        $bodyParams = [];
+        $queryParams  = $request->query();
 
-            if ($contentType === 'application/graphql') {
-                /** @var string $content */
-                $content = $request->getContent();
-                $bodyParams = ['query' => $content];
-            } elseif ($contentType === 'multipart/form-data') {
+        if ($method === 'POST') {
+            $contentType = $request->header('Content-Type');
+
+            if ($contentType === null) {
+                throw new RequestError('Missing "Content-Type" header');
+            }
+
+            if (stripos($contentType, 'application/graphql') !== false) {
+                $bodyParams = ['query' => $request->getContent()];
+            } elseif (stripos($contentType, 'application/json') !== false) {
+                $bodyParams = \Safe\json_decode($request->getContent(), true);
+
+                if (! is_array($bodyParams)) {
+                    throw new RequestError(
+                        'GraphQL Server expects JSON object or array, but got ' .
+                        Utils::printSafeJson($bodyParams)
+                    );
+                }
+            } elseif (stripos($contentType, 'application/x-www-form-urlencoded') !== false) {
+                $bodyParams = $request->post();
+            } elseif (stripos($contentType, 'multipart/form-data') !== false) {
                 $bodyParams = $this->inlineFiles($request);
             } else {
-                // In all other cases, we assume we are given JSON encoded input
-                /** @var string $content */
-                $content = $request->getContent();
-                $bodyParams = \Safe\json_decode($content, true);
+                throw new RequestError('Unexpected content type: ' . Utils::printSafeJson($contentType));
             }
         }
 
-        return $this->helper->parseRequestParams(
-            $request->getMethod(),
-            $bodyParams,
-            $request->all()
-        );
+        return $this->helper->parseRequestParams($method, $bodyParams, $queryParams);
     }
 
     /**
@@ -67,17 +75,18 @@ class RequestParser
      */
     protected function inlineFiles(Request $request): array
     {
-        if (! $request->has('map')) {
+        $mapParam = $request->post('map');
+        if ($mapParam === null) {
             throw new InvariantViolation(
                 'Could not find a valid map, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec'
             );
         }
 
         /** @var array<string, mixed>|array<int, array<string, mixed>> $operations */
-        $operations = \Safe\json_decode($request->input('operations'), true);
+        $operations = \Safe\json_decode($request->post('operations'), true);
 
         /** @var array<string, array<int, string>> $map */
-        $map = \Safe\json_decode($request->input('map'), true);
+        $map = \Safe\json_decode($mapParam, true);
 
         foreach ($map as $fileKey => $operationsPaths) {
             /** @var string $fileKey */

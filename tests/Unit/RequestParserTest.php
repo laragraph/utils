@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Laragraph\LaravelGraphQLUtils\Tests\Unit;
 
+use GraphQL\Server\RequestError;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Laragraph\LaravelGraphQLUtils\RequestParser;
@@ -42,7 +43,7 @@ class RequestParserTest extends TestCase
         self::assertSame($query, $params->query);
     }
 
-    public function testNonSensicalContentTypeDefaultsToJson(): void
+    public function testNonSensicalContentType(): void
     {
         $query = /** @lang GraphQL */ '{ foo }';
         $request = $this->makeRequest(
@@ -54,10 +55,9 @@ class RequestParserTest extends TestCase
         );
 
         $parser = new RequestParser();
+        $this->expectException(RequestError::class);
         /** @var \GraphQL\Server\OperationParams $params */
-        $params = $parser->parseRequest($request);
-
-        self::assertSame($query, $params->query);
+        $parser->parseRequest($request);
     }
 
     public function testNoQuery(): void

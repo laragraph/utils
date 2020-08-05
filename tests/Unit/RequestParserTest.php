@@ -69,7 +69,6 @@ class RequestParserTest extends TestCase
             'POST',
             ['query' => $query],
             [],
-            [],
             ['Content-Type' => 'application/x-www-form-urlencoded']
         );
 
@@ -91,7 +90,6 @@ class RequestParserTest extends TestCase
 
         $parser = new RequestParser();
         $this->expectException(RequestError::class);
-        /** @var \GraphQL\Server\OperationParams $params */
         $parser->parseRequest($request);
     }
 
@@ -118,7 +116,6 @@ class RequestParserTest extends TestCase
 
         $parser = new RequestParser();
         $this->expectException(JsonException::class);
-        /** @var \GraphQL\Server\OperationParams $params */
         $parser->parseRequest($request);
     }
 

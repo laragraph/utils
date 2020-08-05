@@ -35,9 +35,11 @@ class RequestParser
     {
         $method = $request->getMethod();
         $bodyParams = [];
+        /** @var array<string, mixed> $queryParams */
         $queryParams = $request->query();
 
         if ($method === 'POST') {
+            /** @var string|null $contentType */
             $contentType = $request->header('Content-Type');
 
             if ($contentType === null) {
@@ -45,7 +47,9 @@ class RequestParser
             }
 
             if (stripos($contentType, 'application/json') !== false) {
-                $bodyParams = \Safe\json_decode($request->getContent(), true);
+                /** @var string $content */
+                $content = $request->getContent();
+                $bodyParams = \Safe\json_decode($content, true);
 
                 if (! is_array($bodyParams)) {
                     throw new RequestError(
@@ -54,8 +58,11 @@ class RequestParser
                     );
                 }
             } elseif (stripos($contentType, 'application/graphql') !== false) {
-                $bodyParams = ['query' => $request->getContent()];
+                /** @var string $content */
+                $content = $request->getContent();
+                $bodyParams = ['query' => $content];
             } elseif (stripos($contentType, 'application/x-www-form-urlencoded') !== false) {
+                /** @var array<string, mixed> $bodyParams */
                 $bodyParams = $request->post();
             } elseif (stripos($contentType, 'multipart/form-data') !== false) {
                 $bodyParams = $this->inlineFiles($request);
@@ -75,6 +82,7 @@ class RequestParser
      */
     protected function inlineFiles(Request $request): array
     {
+        /** @var string|null $mapParam */
         $mapParam = $request->post('map');
         if ($mapParam === null) {
             throw new InvariantViolation(
@@ -82,8 +90,16 @@ class RequestParser
             );
         }
 
+        /** @var string|null $operationsParam */
+        $operationsParam = $request->post('operations');
+        if ($operationsParam === null) {
+            throw new InvariantViolation(
+                'Could not find a valid operations, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec'
+            );
+        }
+
         /** @var array<string, mixed>|array<int, array<string, mixed>> $operations */
-        $operations = \Safe\json_decode($request->post('operations'), true);
+        $operations = \Safe\json_decode($operationsParam, true);
 
         /** @var array<string, array<int, string>> $map */
         $map = \Safe\json_decode($mapParam, true);

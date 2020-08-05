@@ -38,12 +38,12 @@ class RequestParser
         $queryParams = $request->query();
 
         if ($method === 'POST') {
-            /** @var string|null $contentType */
+            /**
+             * Never null, since Symfony defaults to application/x-www-form-urlencoded.
+             *
+             * @var string $contentType
+             */
             $contentType = $request->header('Content-Type');
-
-            if ($contentType === null) {
-                throw new RequestError('Missing "Content-Type" header');
-            }
 
             if (stripos($contentType, 'application/json') !== false) {
                 /** @var string $content */

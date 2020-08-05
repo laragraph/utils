@@ -79,6 +79,21 @@ class RequestParserTest extends TestCase
         self::assertSame($query, $params->query);
     }
 
+    public function testPostDefaultsToRegularForm(): void
+    {
+        $query = /** @lang GraphQL */ '{ foo }';
+        $request = $this->makeRequest(
+            'POST',
+            ['query' => $query]
+        );
+
+        $parser = new RequestParser();
+        /** @var \GraphQL\Server\OperationParams $params */
+        $params = $parser->parseRequest($request);
+
+        self::assertSame($query, $params->query);
+    }
+
     public function testNonSensicalContentType(): void
     {
         $request = $this->makeRequest(
@@ -116,6 +131,21 @@ class RequestParserTest extends TestCase
 
         $parser = new RequestParser();
         $this->expectException(JsonException::class);
+        $parser->parseRequest($request);
+    }
+
+    public function testNonArrayJson(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [],
+            [],
+            ['Content-Type' => 'application/json'],
+            '"this should be a map with query, variables, etc."'
+        );
+
+        $parser = new RequestParser();
+        $this->expectException(RequestError::class);
         $parser->parseRequest($request);
     }
 

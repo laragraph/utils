@@ -22,7 +22,8 @@ This package holds basic utilities that are useful for building a GraphQL server
 If you want to build an application, we recommend using a full framework that integrates the
 primitives within this package:
 
-- [Lighthouse](https://github.com/nuwave/lighthouse)
+- SDL-first: [Lighthouse](https://github.com/nuwave/lighthouse)
+- Code-first: [graphql-laravel](https://github.com/rebing/graphql-laravel)
 
 ## Changelog
 

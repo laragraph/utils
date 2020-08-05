@@ -53,7 +53,7 @@ class RequestParser
                         Utils::printSafeJson($bodyParams)
                     );
                 }
-            } else if (stripos($contentType, 'application/graphql') !== false) {
+            } elseif (stripos($contentType, 'application/graphql') !== false) {
                 $bodyParams = ['query' => $request->getContent()];
             } elseif (stripos($contentType, 'application/x-www-form-urlencoded') !== false) {
                 $bodyParams = $request->post();

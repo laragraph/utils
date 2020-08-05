@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Laragraph\LaravelGraphQLUtils;
 
-use GraphQL\Error\InvariantViolation;
 use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;

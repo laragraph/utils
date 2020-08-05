@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Laragraph\LaravelGraphQLUtils\RequestParser;
 use Orchestra\Testbench\TestCase;
+use Safe\Exceptions\JsonException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class RequestParserTest extends TestCase
@@ -17,6 +18,24 @@ class RequestParserTest extends TestCase
     {
         $query = /** @lang GraphQL */ '{ foo }';
         $request = $this->makeRequest('GET', ['query' => $query]);
+
+        $parser = new RequestParser();
+        /** @var \GraphQL\Server\OperationParams $params */
+        $params = $parser->parseRequest($request);
+
+        self::assertSame($query, $params->query);
+    }
+
+    public function testPostWithJson(): void
+    {
+        $query = /** @lang GraphQL */ '{ foo }';
+        $request = $this->makeRequest(
+            'POST',
+            [],
+            [],
+            ['Content-Type' => 'application/json'],
+            \Safe\json_encode(['query' => $query])
+        );
 
         $parser = new RequestParser();
         /** @var \GraphQL\Server\OperationParams $params */
@@ -43,15 +62,31 @@ class RequestParserTest extends TestCase
         self::assertSame($query, $params->query);
     }
 
-    public function testNonSensicalContentType(): void
+    public function testPostWithRegularForm(): void
     {
         $query = /** @lang GraphQL */ '{ foo }';
+        $request = $this->makeRequest(
+            'POST',
+            ['query' => $query],
+            [],
+            [],
+            ['Content-Type' => 'application/x-www-form-urlencoded']
+        );
+
+        $parser = new RequestParser();
+        /** @var \GraphQL\Server\OperationParams $params */
+        $params = $parser->parseRequest($request);
+
+        self::assertSame($query, $params->query);
+    }
+
+    public function testNonSensicalContentType(): void
+    {
         $request = $this->makeRequest(
             'POST',
             [],
             [],
             ['Content-Type' => 'foobar'],
-            \Safe\json_encode(['query' => $query])
         );
 
         $parser = new RequestParser();
@@ -69,6 +104,22 @@ class RequestParserTest extends TestCase
         $params = $parser->parseRequest($request);
 
         self::assertSame(null, $params->query);
+    }
+
+    public function testInvalidJson(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [],
+            [],
+            ['Content-Type' => 'application/json'],
+            'this is not valid json'
+        );
+
+        $parser = new RequestParser();
+        $this->expectException(JsonException::class);
+        /** @var \GraphQL\Server\OperationParams $params */
+        $parser->parseRequest($request);
     }
 
     public function testMultipartFormRequest(): void

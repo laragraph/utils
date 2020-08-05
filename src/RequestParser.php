@@ -44,9 +44,7 @@ class RequestParser
                 throw new RequestError('Missing "Content-Type" header');
             }
 
-            if (stripos($contentType, 'application/graphql') !== false) {
-                $bodyParams = ['query' => $request->getContent()];
-            } elseif (stripos($contentType, 'application/json') !== false) {
+            if (stripos($contentType, 'application/json') !== false) {
                 $bodyParams = \Safe\json_decode($request->getContent(), true);
 
                 if (! is_array($bodyParams)) {
@@ -55,6 +53,8 @@ class RequestParser
                         Utils::printSafeJson($bodyParams)
                     );
                 }
+            } else if (stripos($contentType, 'application/graphql') !== false) {
+                $bodyParams = ['query' => $request->getContent()];
             } elseif (stripos($contentType, 'application/x-www-form-urlencoded') !== false) {
                 $bodyParams = $request->post();
             } elseif (stripos($contentType, 'multipart/form-data') !== false) {

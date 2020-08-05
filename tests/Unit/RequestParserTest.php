@@ -86,7 +86,7 @@ class RequestParserTest extends TestCase
             'POST',
             [],
             [],
-            ['Content-Type' => 'foobar'],
+            ['Content-Type' => 'foobar']
         );
 
         $parser = new RequestParser();

@@ -85,7 +85,7 @@ class RequestParser
         /** @var string|null $mapParam */
         $mapParam = $request->post('map');
         if ($mapParam === null) {
-            throw new InvariantViolation(
+            throw new RequestError(
                 'Could not find a valid map, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec'
             );
         }
@@ -93,8 +93,8 @@ class RequestParser
         /** @var string|null $operationsParam */
         $operationsParam = $request->post('operations');
         if ($operationsParam === null) {
-            throw new InvariantViolation(
-                'Could not find a valid operations, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec'
+            throw new RequestError(
+                'Could not find valid operations, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec'
             );
         }
 

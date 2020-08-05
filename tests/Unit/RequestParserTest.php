@@ -160,6 +160,44 @@ class RequestParserTest extends TestCase
         self::assertSame($file, $variables['file']);
     }
 
+    public function testMultipartFormWithoutMap(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [],
+            [],
+            [
+                'Content-Type' => 'multipart/form-data',
+            ]
+        );
+
+        $parser = new RequestParser();
+        $this->expectException(RequestError::class);
+        $parser->parseRequest($request);
+    }
+
+    public function testMultipartFormWithoutOperations(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [
+                'map' => /** @lang JSON */ '
+                    {
+                        "0": ["variables.file"]
+                    }
+                ',
+            ],
+            [],
+            [
+                'Content-Type' => 'multipart/form-data',
+            ]
+        );
+
+        $parser = new RequestParser();
+        $this->expectException(RequestError::class);
+        $parser->parseRequest($request);
+    }
+
     /**
      * @param  string  $method
      * @param  array<mixed>  $parameters

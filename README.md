@@ -1,4 +1,4 @@
-# utils
+# laragraph/utils
 
 [![CI Status](https://github.com/laragraph/utils/workflows/Continuous%20Integration/badge.svg)](https://github.com/laragraph/utils/actions)
 [![codecov](https://codecov.io/gh/laragraph/utils/branch/master/graph/badge.svg)](https://codecov.io/gh/laragraph/utils)

@@ -59,8 +59,8 @@ jobs:
           - "^7"
           - "^8"
         exclude:
-          laravel-version: "^8"
-          php-version: "7.2"
+          - laravel-version: "^8"
+            php-version: "7.2"
 
     steps:
       - name: "Checkout"

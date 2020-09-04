@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Laragraph\LaravelGraphQLUtils\Tests\Unit;
+namespace Laragraph\Utils\Tests\Unit;
 
 use GraphQL\Server\RequestError;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Laragraph\LaravelGraphQLUtils\RequestParser;
+use Laragraph\Utils\RequestParser;
 use Orchestra\Testbench\TestCase;
 use Safe\Exceptions\JsonException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;

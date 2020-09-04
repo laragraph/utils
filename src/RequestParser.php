@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Laragraph\LaravelGraphQLUtils;
+namespace Laragraph\Utils;
 
 use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;

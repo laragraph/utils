@@ -49,5 +49,5 @@ repository:
   has_pages: false
   has_projects: false
   has_wiki: false
-  name: laravel-graphql-utils
+  name: utils
   private: false

@@ -1,8 +1,8 @@
 {
-  "name": "laragraph/laravel-graphql-utils",
+  "name": "laragraph/utils",
   "type": "library",
   "description": "Utilities for using GraphQL with Laravel",
-  "homepage": "https://github.com/laragraph/laravel-graphql-utils",
+  "homepage": "https://github.com/laragraph/utils",
   "license": "MIT",
   "authors": [
     {
@@ -41,19 +41,19 @@
   },
   "autoload": {
     "psr-4": {
-      "Laragraph\\LaravelGraphQLUtils\\": "src/"
+      "Laragraph\\Utils\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Laragraph\\LaravelGraphQLUtils\\Tests\\": "tests/"
+      "Laragraph\\Utils\\Tests\\": "tests/"
     },
     "files": [
       "vendor/symfony/var-dumper/Resources/functions/dump.php"
     ]
   },
   "support": {
-    "issues": "https://github.com/laragraph/laravel-graphql-utils/issues",
-    "source": "https://github.com/laragraph/laravel-graphql-utils"
+    "issues": "https://github.com/laragraph/utils/issues",
+    "source": "https://github.com/laragraph/utils"
   }
 }

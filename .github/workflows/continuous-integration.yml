@@ -48,14 +48,16 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - 7.2
-          - 7.3
-          - 7.4
-
-        dependencies:
-          - lowest
-          - locked
-          - highest
+          - "7.2"
+          - "7.3"
+          - "7.4"
+        laravel-version:
+          - "5.6.*"
+          - "5.7.*"
+          - "5.8.*"
+          - "^6"
+          - "^7"
+          - "^8"
 
     steps:
       - name: "Checkout"
@@ -68,17 +70,11 @@ jobs:
           extensions: "mbstring"
           php-version: ${{ matrix.php-version }}
 
-      - name: "Install lowest dependencies with composer"
-        if: matrix.dependencies == 'lowest'
-        run: composer update --prefer-lowest --no-interaction --no-progress --no-suggest
+      - name: "Remove conflicting dependencies that are not needed here"
+        run: composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench --no-update
 
-      - name: "Install locked dependencies with composer"
-        if: matrix.dependencies == 'locked'
-        run: composer install --no-interaction --no-progress --no-suggest
-
-      - name: "Install highest dependencies with composer"
-        if: matrix.dependencies == 'highest'
-        run: composer update --no-interaction --no-progress --no-suggest
+      - name: "Install dependencies with composer"
+        run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-interaction --no-suggest
 
       - name: "Run unit tests with phpunit/phpunit"
         run: vendor/bin/phpunit

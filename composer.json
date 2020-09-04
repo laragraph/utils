@@ -21,8 +21,7 @@
     "ergebnis/composer-normalize": "^2.6.1",
     "infection/infection": "~0.16.4",
     "jangregor/phpstan-prophecy": "0.8.0",
-    "orchestra/database": "3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4 || ^5 || dev-master",
-    "orchestra/testbench": "3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4 || ^5 || dev-master",
+    "orchestra/testbench": "3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4 || ^5 || ^6",
     "phpstan/extension-installer": "^1",
     "phpstan/phpstan": "0.12.42",
     "phpstan/phpstan-deprecation-rules": "0.12.5",
@@ -37,7 +36,6 @@
     "preferred-install": "dist",
     "sort-packages": true
   },
-  "minimum-stability": "dev",
   "autoload": {
     "psr-4": {
       "Laragraph\\Utils\\": "src/"

@@ -36,7 +36,6 @@
     "preferred-install": "dist",
     "sort-packages": true
   },
-  "minimum-stability": "dev",
   "autoload": {
     "psr-4": {
       "Laragraph\\Utils\\": "src/"
@@ -50,6 +49,7 @@
       "vendor/symfony/var-dumper/Resources/functions/dump.php"
     ]
   },
+  "minimum-stability": "dev",
   "support": {
     "issues": "https://github.com/laragraph/utils/issues",
     "source": "https://github.com/laragraph/utils"

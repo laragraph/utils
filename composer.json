@@ -37,6 +37,7 @@
     "preferred-install": "dist",
     "sort-packages": true
   },
+  "minimum-stability": "dev",
   "autoload": {
     "psr-4": {
       "Laragraph\\Utils\\": "src/"

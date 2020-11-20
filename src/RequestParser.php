@@ -105,7 +105,6 @@ class RequestParser
 
         foreach ($map as $fileKey => $operationsPaths) {
             /** @var array<string> $operationsPaths */
-
             $file = $request->file((string) $fileKey);
 
             /** @var string $operationsPath */

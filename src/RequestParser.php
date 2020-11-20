@@ -100,13 +100,13 @@ class RequestParser
         /** @var array<string, mixed>|array<int, array<string, mixed>> $operations */
         $operations = \Safe\json_decode($operationsParam, true);
 
-        /** @var array<string, array<int, string>> $map */
+        /** @var array<int|string, array<int, string>> $map */
         $map = \Safe\json_decode($mapParam, true);
 
         foreach ($map as $fileKey => $operationsPaths) {
-            /** @var string $fileKey */
             /** @var array<string> $operationsPaths */
-            $file = $request->file($fileKey);
+
+            $file = $request->file((string) $fileKey);
 
             /** @var string $operationsPath */
             foreach ($operationsPaths as $operationsPath) {

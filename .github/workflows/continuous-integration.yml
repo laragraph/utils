@@ -16,14 +16,19 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@master
 
+      - name: "Install PHP with extensions"
+        uses: shivammathur/setup-php@2.7.0
+        with:
+          php-version: 7.4
+
       - name: "Validate composer.json and composer.lock"
-        run: php7.3 /usr/bin/composer validate --strict
+        run: composer validate --strict
 
       - name: "Install locked dependencies with composer"
-        run: php7.3 /usr/bin/composer install --no-interaction --no-progress --no-suggest
+        run: composer install --no-interaction --no-progress --no-suggest
 
       - name: "Run localheinz/composer-normalize"
-        run: php7.3 /usr/bin/composer normalize --dry-run
+        run: composer normalize --dry-run
 
   static-code-analysis:
     name: "Static Code Analysis"
@@ -34,11 +39,16 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@master
 
+      - name: "Install PHP with extensions"
+        uses: shivammathur/setup-php@2.7.0
+        with:
+          php-version: 7.4
+
       - name: "Install locked dependencies with composer"
-        run: php7.3 /usr/bin/composer install --no-interaction --no-progress --no-suggest
+        run: composer install --no-interaction --no-progress --no-suggest
 
       - name: "Run phpstan/phpstan"
-        run: php7.3 vendor/bin/phpstan analyse --configuration=phpstan.neon
+        run: vendor/bin/phpstan analyse --configuration=phpstan.neon
 
   tests:
     name: "Tests"
@@ -67,10 +77,10 @@ jobs:
         uses: actions/checkout@master
 
       - name: "Install PHP with extensions"
-        uses: shivammathur/setup-php@1.6.1
+        uses: shivammathur/setup-php@2.7.0
         with:
           coverage: none
-          extensions: "mbstring"
+          extensions: mbstring
           php-version: ${{ matrix.php-version }}
 
       - name: "Remove conflicting dependencies that are not needed here"
@@ -91,14 +101,19 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@master
 
+      - name: "Install PHP with extensions"
+        uses: shivammathur/setup-php@2.7.0
+        with:
+          php-version: 7.4
+
       - name: "Install locked dependencies with composer"
-        run: php7.3 /usr/bin/composer install --no-interaction --no-progress --no-suggest
+        run: composer install --no-interaction --no-progress --no-suggest
 
       - name: "Dump Xdebug filter with phpunit/phpunit"
-        run: php7.3 vendor/bin/phpunit --dump-xdebug-filter=.build/phpunit/xdebug-filter.php
+        run: vendor/bin/phpunit --dump-xdebug-filter=.build/phpunit/xdebug-filter.php
 
       - name: "Collect code coverage with Xdebug and phpunit/phpunit"
-        run: php7.3 vendor/bin/phpunit --coverage-clover=build/logs/clover.xml --prepend=.build/phpunit/xdebug-filter.php
+        run: vendor/bin/phpunit --coverage-clover=build/logs/clover.xml --prepend=.build/phpunit/xdebug-filter.php
 
       # Not using codecov/codecov-action for now, as the build is prohibitively slow
       - name: "Download code coverage uploader for Codecov.io"
@@ -116,8 +131,13 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@master
 
+      - name: "Install PHP with extensions"
+        uses: shivammathur/setup-php@2.7.0
+        with:
+          php-version: 7.4
+
       - name: "Install locked dependencies with composer"
-        run: php7.3 /usr/bin/composer install --no-interaction --no-progress --no-suggest
+        run: composer install --no-interaction --no-progress --no-suggest
 
       - name: "Run mutation tests with infection/infection"
-        run: php7.3 vendor/bin/infection --ignore-msi-with-no-mutations --min-covered-msi=100 --min-msi=100
+        run: vendor/bin/infection --ignore-msi-with-no-mutations --min-covered-msi=100 --min-msi=100

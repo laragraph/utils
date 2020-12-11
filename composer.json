@@ -19,14 +19,14 @@
   },
   "require-dev": {
     "ergebnis/composer-normalize": "^2.11",
-    "infection/infection": "^0.20.2",
+    "infection/infection": "~0.15",
     "jangregor/phpstan-prophecy": "^0.8.1",
     "orchestra/testbench": "3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4.0 || ^5.0 || ^6.0",
     "phpstan/extension-installer": "^1.0",
     "phpstan/phpstan": "^0.12.57",
     "phpstan/phpstan-deprecation-rules": "^0.12.5",
     "phpstan/phpstan-strict-rules": "^0.12.5",
-    "phpunit/phpunit": "^7.5 || ^8.4 || ^9.5",
+    "phpunit/phpunit": "^7.5 || ^8.5 || ^9.5",
     "thecodingmachine/phpstan-safe-rule": "^1.0"
   },
   "config": {

@@ -48,7 +48,7 @@ jobs:
         run: composer install --no-interaction --no-progress
 
       - name: "Run phpstan/phpstan"
-        run: vendor/bin/phpstan analyse --configuration=phpstan.neon --memory-limit=-1 -vvv
+        run: vendor/bin/phpstan analyse --configuration=phpstan.neon --memory-limit=-1
 
   tests:
     name: "Tests"
@@ -90,6 +90,9 @@ jobs:
           coverage: none
           extensions: mbstring
           php-version: ${{ matrix.php-version }}
+
+      - name: "Remove conflicting dependencies that are not needed here"
+        run: composer remove --dev infection/infection --no-update
 
       - name: "Install dependencies with composer"
         run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist

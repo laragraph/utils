@@ -26,9 +26,9 @@ class RequestParser
     /**
      * Converts an incoming HTTP request to one or more OperationParams.
      *
-     * @return OperationParams|array<int, OperationParams>
+     * @return \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>
      *
-     * @throws RequestError
+     * @throws \GraphQL\Server\RequestError
      */
     public function parseRequest(Request $request)
     {

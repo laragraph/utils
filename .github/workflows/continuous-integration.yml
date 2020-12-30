@@ -112,16 +112,14 @@ jobs:
       - name: "Install PHP with extensions"
         uses: shivammathur/setup-php@v2
         with:
+          coverage: pcov
           php-version: 7.4
 
       - name: "Install locked dependencies with composer"
         run: composer install --no-interaction --no-progress
 
-      - name: "Dump Xdebug filter with phpunit/phpunit"
-        run: vendor/bin/phpunit --dump-xdebug-filter=.build/phpunit/xdebug-filter.php
-
       - name: "Collect code coverage with Xdebug and phpunit/phpunit"
-        run: vendor/bin/phpunit --coverage-clover=build/logs/clover.xml --prepend=.build/phpunit/xdebug-filter.php
+        run: vendor/bin/phpunit --coverage-clover=build/logs/clover.xml
 
       # Not using codecov/codecov-action for now, as the build is prohibitively slow
       - name: "Download code coverage uploader for Codecov.io"

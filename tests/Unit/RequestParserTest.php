@@ -229,12 +229,10 @@ class RequestParserTest extends TestCase
     }
 
     /**
-     * @param  string  $method
      * @param  array<mixed>  $parameters
      * @param  array<mixed>  $files
      * @param  array<mixed>  $headers
      * @param  string|resource|null  $content
-     * @return \Illuminate\Http\Request
      */
     public function makeRequest(string $method, array $parameters = [], array $files = [], array $headers = [], $content = null): Request
     {

@@ -4,9 +4,13 @@ We are using [GitHub Actions](https://github.com/features/actions) as a continuo
 
 For details, see [`workflows/continuous-integration.yml`](workflows/continuous-integration.yml).
 
-## Code Style
+## Code style
 
-The code style is automatically fixed through [StyleCI](https://styleci.io/).
+We format the code automatically with [php-cs-fixer](https://github.com/friendsofphp/php-cs-fixer)
+
+    make fix
+
+Prefer explicit naming and short, focused functions over excessive comments.
 
 ## Static Code Analysis
 

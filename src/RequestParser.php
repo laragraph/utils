@@ -11,6 +11,9 @@ use GraphQL\Utils\Utils;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
+/**
+ * Follows https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md.
+ */
 class RequestParser
 {
     /**
@@ -45,7 +48,7 @@ class RequestParser
              */
             $contentType = $request->header('Content-Type');
 
-            if (false !== stripos($contentType, 'application/json')) {
+            if (in_array($contentType, ['application/json', 'application/graphql+json'], true)) {
                 /** @var string $content */
                 $content = $request->getContent();
                 $bodyParams = \Safe\json_decode($content, true);
@@ -56,14 +59,14 @@ class RequestParser
                         . Utils::printSafeJson($bodyParams)
                     );
                 }
-            } elseif (false !== stripos($contentType, 'application/graphql')) {
+            } elseif ('application/graphql' === $contentType) {
                 /** @var string $content */
                 $content = $request->getContent();
                 $bodyParams = ['query' => $content];
-            } elseif (false !== stripos($contentType, 'application/x-www-form-urlencoded')) {
+            } elseif ('application/x-www-form-urlencoded' === $contentType) {
                 /** @var array<string, mixed> $bodyParams */
                 $bodyParams = $request->post();
-            } elseif (false !== stripos($contentType, 'multipart/form-data')) {
+            } elseif ('multipart/form-data' === $contentType) {
                 $bodyParams = $this->inlineFiles($request);
             } else {
                 throw new RequestError('Unexpected content type: ' . Utils::printSafeJson($contentType));

@@ -44,6 +44,24 @@ class RequestParserTest extends TestCase
         self::assertSame($query, $params->query);
     }
 
+    public function testPostWithGraphQLPlusJson(): void
+    {
+        $query = /** @lang GraphQL */ '{ foo }';
+        $request = $this->makeRequest(
+            'POST',
+            [],
+            [],
+            ['Content-Type' => 'application/graphql+json'],
+            \Safe\json_encode(['query' => $query])
+        );
+
+        $parser = new RequestParser();
+        /** @var \GraphQL\Server\OperationParams $params */
+        $params = $parser->parseRequest($request);
+
+        self::assertSame($query, $params->query);
+    }
+
     public function testPostWithQueryApplicationGraphQL(): void
     {
         $query = /** @lang GraphQL */ '{ foo }';

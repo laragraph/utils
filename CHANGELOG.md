@@ -6,7 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
-## 1.0.0
+## v1.1.0
+
+### Added
+
+- Recognize `Content-Type: application/graphql+json` in `RequestParser`
+
+## v1.0.0
 
 ### Added
 

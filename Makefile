@@ -1,5 +1,5 @@
 .PHONY: it
-it: fix stan test ## Runs the cs, stan, and test targets
+it: fix stan test ## Runs all common targets
 
 .PHONY: coverage
 coverage: vendor ## Collects coverage from running unit tests with phpunit
@@ -8,7 +8,8 @@ coverage: vendor ## Collects coverage from running unit tests with phpunit
 	vendor/bin/phpunit --coverage-text --prepend=.build/phpunit/xdebug-filter.php
 
 .PHONY: fix
-fix: vendor
+fix: vendor ## Fix the codestyle
+	composer normalize
 	vendor/bin/php-cs-fixer fix
 
 .PHONY: help
@@ -33,4 +34,3 @@ test: vendor ## Runs auto-review, unit, and integration tests with phpunit
 vendor: composer.json
 	composer validate --strict
 	composer install
-	composer normalize

@@ -2,7 +2,6 @@ includes:
 - vendor/phpstan/phpstan/conf/bleedingEdge.neon
 parameters:
 	level: max
-	inferPrivatePropertyTypeFromConstructor: true
 	paths:
 	- src
 	- tests

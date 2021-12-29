@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
-- Check existence of `multipart/form-data` in `Content-Type`.
+- Fix check of `multipart/form-data` in `Content-Type`.
 
 ## v1.1.0
 

@@ -66,7 +66,7 @@ class RequestParser
             } elseif ('application/x-www-form-urlencoded' === $contentType) {
                 /** @var array<string, mixed> $bodyParams */
                 $bodyParams = $request->post();
-            } elseif ('multipart/form-data' === $contentType) {
+            } elseif (false !== stripos($contentType, 'multipart/form-data')) {
                 $bodyParams = $this->inlineFiles($request);
             } else {
                 throw new RequestError('Unexpected content type: ' . Utils::printSafeJson($contentType));

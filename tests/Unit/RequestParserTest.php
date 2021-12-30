@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Laragraph\Utils\Tests\Unit;
 
+use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -19,82 +20,95 @@ class RequestParserTest extends TestCase
         $query = /** @lang GraphQL */ '{ foo }';
         $request = $this->makeRequest('GET', ['query' => $query]);
 
-        $parser = new RequestParser();
-        /** @var \GraphQL\Server\OperationParams $params */
-        $params = $parser->parseRequest($request);
+        $params = (new RequestParser())->parseRequest($request);
 
+        self::assertInstanceOf(OperationParams::class, $params);
         self::assertSame($query, $params->query);
     }
 
-    public function testPostWithJson(): void
+    /**
+     * @dataProvider jsonLikeContentTypes
+     */
+    public function testPostWithJsonLike(string $contentType): void
     {
         $query = /** @lang GraphQL */ '{ foo }';
         $request = $this->makeRequest(
             'POST',
             [],
             [],
-            ['Content-Type' => 'application/json'],
+            ['Content-Type' => $contentType],
             \Safe\json_encode(['query' => $query])
         );
+        $params = (new RequestParser())->parseRequest($request);
 
-        $parser = new RequestParser();
-        /** @var \GraphQL\Server\OperationParams $params */
-        $params = $parser->parseRequest($request);
-
+        self::assertInstanceOf(OperationParams::class, $params);
         self::assertSame($query, $params->query);
     }
 
-    public function testPostWithGraphQLPlusJson(): void
+    /**
+     * @return iterable<array{string}>
+     */
+    public function jsonLikeContentTypes(): iterable
+    {
+        yield ['application/json'];
+        yield ['application/graphql+json'];
+        yield ['application/json;charset=UTF-8'];
+    }
+
+    /**
+     * @dataProvider graphQLContentTypes
+     */
+    public function testPostWithQueryApplicationGraphQL(string $contentType): void
     {
         $query = /** @lang GraphQL */ '{ foo }';
         $request = $this->makeRequest(
             'POST',
             [],
             [],
-            ['Content-Type' => 'application/graphql+json'],
-            \Safe\json_encode(['query' => $query])
-        );
-
-        $parser = new RequestParser();
-        /** @var \GraphQL\Server\OperationParams $params */
-        $params = $parser->parseRequest($request);
-
-        self::assertSame($query, $params->query);
-    }
-
-    public function testPostWithQueryApplicationGraphQL(): void
-    {
-        $query = /** @lang GraphQL */ '{ foo }';
-        $request = $this->makeRequest(
-            'POST',
-            [],
-            [],
-            ['Content-Type' => 'application/graphql'],
+            ['Content-Type' => $contentType],
             $query
         );
+        $params = (new RequestParser())->parseRequest($request);
 
-        $parser = new RequestParser();
-        /** @var \GraphQL\Server\OperationParams $params */
-        $params = $parser->parseRequest($request);
-
+        self::assertInstanceOf(OperationParams::class, $params);
         self::assertSame($query, $params->query);
     }
 
-    public function testPostWithRegularForm(): void
+    /**
+     * @return iterable<array{string}>
+     */
+    public function graphQLContentTypes(): iterable
+    {
+        yield ['application/graphql'];
+        yield ['application/graphql;charset=UTF-8'];
+    }
+
+    /**
+     * @dataProvider formContentTypes
+     */
+    public function testPostWithRegularForm(string $contentType): void
     {
         $query = /** @lang GraphQL */ '{ foo }';
+        $contentType = 'application/x-www-form-urlencoded';
         $request = $this->makeRequest(
             'POST',
             ['query' => $query],
             [],
-            ['Content-Type' => 'application/x-www-form-urlencoded']
+            ['Content-Type' => $contentType]
         );
+        $params = (new RequestParser())->parseRequest($request);
 
-        $parser = new RequestParser();
-        /** @var \GraphQL\Server\OperationParams $params */
-        $params = $parser->parseRequest($request);
-
+        self::assertInstanceOf(OperationParams::class, $params);
         self::assertSame($query, $params->query);
+    }
+
+    /**
+     * @return iterable<array{string}>
+     */
+    public function formContentTypes(): iterable
+    {
+        yield ['application/x-www-form-urlencoded'];
+        yield ['application/x-www-form-urlencoded;bla;blub'];
     }
 
     public function testPostDefaultsToRegularForm(): void
@@ -105,36 +119,49 @@ class RequestParserTest extends TestCase
             ['query' => $query]
         );
 
-        $parser = new RequestParser();
-        /** @var \GraphQL\Server\OperationParams $params */
-        $params = $parser->parseRequest($request);
+        $params = (new RequestParser())->parseRequest($request);
+        self::assertInstanceOf(OperationParams::class, $params);
 
         self::assertSame($query, $params->query);
     }
 
-    public function testNonSensicalContentType(): void
+    /**
+     * @dataProvider nonsensicalContentTypes
+     */
+    public function testNonsensicalContentTypes(string $contentType): void
     {
         $request = $this->makeRequest(
             'POST',
             [],
             [],
-            ['Content-Type' => 'foobar']
+            ['Content-Type' => $contentType]
         );
-
         $parser = new RequestParser();
+
         $this->expectException(RequestError::class);
         $parser->parseRequest($request);
+    }
+
+    /**
+     * @return iterable<array{string}>
+     */
+    public function nonsensicalContentTypes(): iterable
+    {
+        yield ['foobar'];
+        yield ['application/foobar'];
+        yield ['application/josn'];
+        yield ['application/grapql'];
+        yield ['application/foo;charset=application/json'];
     }
 
     public function testNoQuery(): void
     {
         $request = $this->makeRequest('GET');
+        $params = (new RequestParser())->parseRequest($request);
 
-        $parser = new RequestParser();
-        /** @var \GraphQL\Server\OperationParams $params */
-        $params = $parser->parseRequest($request);
-
-        self::assertSame(null, $params->query);
+        self::assertInstanceOf(OperationParams::class, $params);
+        // @phpstan-ignore-next-line graphql-php is inaccurate
+        self::assertNull($params->query);
     }
 
     public function testInvalidJson(): void
@@ -146,8 +173,8 @@ class RequestParserTest extends TestCase
             ['Content-Type' => 'application/json'],
             'this is not valid json'
         );
-
         $parser = new RequestParser();
+
         $this->expectException(JsonException::class);
         $parser->parseRequest($request);
     }
@@ -161,13 +188,16 @@ class RequestParserTest extends TestCase
             ['Content-Type' => 'application/json'],
             '"this should be a map with query, variables, etc."'
         );
-
         $parser = new RequestParser();
+
         $this->expectException(RequestError::class);
         $parser->parseRequest($request);
     }
 
-    public function testMultipartFormRequest(): void
+    /**
+     * @dataProvider multipartFormContentTypes
+     */
+    public function testMultipartFormRequest(string $contentType): void
     {
         $file = UploadedFile::fake()->create('image.jpg', 500);
 
@@ -192,20 +222,28 @@ class RequestParserTest extends TestCase
                 '0' => $file,
             ],
             [
-                'Content-Type' => 'multipart/form-data',
+                'Content-Type' => $contentType,
             ]
         );
 
-        $parser = new RequestParser();
-        /** @var \GraphQL\Server\OperationParams $params */
-        $params = $parser->parseRequest($request);
+        $params = (new RequestParser())->parseRequest($request);
 
-        self::assertSame('mutation Upload($file: Upload!) { upload(file: $file) }', $params->query);
+        self::assertInstanceOf(OperationParams::class, $params);
+        self::assertSame(/** @lang GraphQL */ 'mutation Upload($file: Upload!) { upload(file: $file) }', $params->query);
 
         $variables = $params->variables;
         self::assertNotNull($variables);
         /** @var array<string, mixed> $variables */
         self::assertSame($file, $variables['file']);
+    }
+
+    /**
+     * @return iterable<array{string}>
+     */
+    public function multipartFormContentTypes(): iterable
+    {
+        yield ['multipart/form-data'];
+        yield ['multipart/form-data; boundary=----WebkitFormBoundaryasodfh98ho1hfdsdfadfNX'];
     }
 
     public function testMultipartFormWithoutMap(): void
@@ -218,8 +256,8 @@ class RequestParserTest extends TestCase
                 'Content-Type' => 'multipart/form-data',
             ]
         );
-
         $parser = new RequestParser();
+
         $this->expectException(RequestError::class);
         $parser->parseRequest($request);
     }
@@ -242,6 +280,7 @@ class RequestParserTest extends TestCase
         );
 
         $parser = new RequestParser();
+
         $this->expectException(RequestError::class);
         $parser->parseRequest($request);
     }

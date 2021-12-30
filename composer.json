@@ -30,6 +30,7 @@
     "phpstan/extension-installer": "^1",
     "phpstan/phpstan": "^1",
     "phpstan/phpstan-deprecation-rules": "^1",
+    "phpstan/phpstan-phpunit": "^1.0",
     "phpstan/phpstan-strict-rules": "^1",
     "phpunit/phpunit": "^7.5 || ^8.5 || ^9",
     "thecodingmachine/phpstan-safe-rule": "^1.1"

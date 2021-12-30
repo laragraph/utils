@@ -10,6 +10,7 @@ use GraphQL\Server\RequestError;
 use GraphQL\Utils\Utils;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 /**
  * Follows https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md.
@@ -48,7 +49,7 @@ class RequestParser
              */
             $contentType = $request->header('Content-Type');
 
-            if (in_array($contentType, ['application/json', 'application/graphql+json'], true)) {
+            if (Str::startsWith($contentType, ['application/json', 'application/graphql+json'])) {
                 /** @var string $content */
                 $content = $request->getContent();
                 $bodyParams = \Safe\json_decode($content, true);
@@ -59,14 +60,14 @@ class RequestParser
                         . Utils::printSafeJson($bodyParams)
                     );
                 }
-            } elseif ('application/graphql' === $contentType) {
+            } elseif (Str::startsWith($contentType, 'application/graphql')) {
                 /** @var string $content */
                 $content = $request->getContent();
                 $bodyParams = ['query' => $content];
-            } elseif ('application/x-www-form-urlencoded' === $contentType) {
+            } elseif (Str::startsWith($contentType, 'application/x-www-form-urlencoded')) {
                 /** @var array<string, mixed> $bodyParams */
                 $bodyParams = $request->post();
-            } elseif ('multipart/form-data' === $contentType) {
+            } elseif (Str::startsWith($contentType, 'multipart/form-data')) {
                 $bodyParams = $this->inlineFiles($request);
             } else {
                 throw new RequestError('Unexpected content type: ' . Utils::printSafeJson($contentType));
@@ -109,7 +110,6 @@ class RequestParser
             /** @var array<string> $operationsPaths */
             $file = $request->file((string) $fileKey);
 
-            /** @var string $operationsPath */
             foreach ($operationsPaths as $operationsPath) {
                 Arr::set($operations, $operationsPath, $file);
             }

@@ -8,9 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## v1.2.1
 
-### Changed
+### Added
 
-- Added support for `^2.0` of `thecodingmachine/safe`
+- Added support for version `^2` of `thecodingmachine/safe`
 
 ## v1.1.1
 

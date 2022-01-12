@@ -23,7 +23,6 @@
   },
   "require-dev": {
     "ergebnis/composer-normalize": "^2.11",
-    "infection/infection": "^0.25",
     "jangregor/phpstan-prophecy": "^1",
     "mll-lab/php-cs-fixer-config": "^4.4",
     "orchestra/testbench": "3.6.* || 3.7.* || 3.8.* || 3.9.* || ^4 || ^5 || ^6",

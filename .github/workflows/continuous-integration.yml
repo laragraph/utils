@@ -91,9 +91,6 @@ jobs:
           extensions: mbstring
           php-version: ${{ matrix.php-version }}
 
-      - name: "Remove conflicting dependencies that are not needed here"
-        run: composer remove --dev infection/infection --no-update
-
       - name: "Install dependencies with composer"
         run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist
 
@@ -127,25 +124,3 @@ jobs:
 
       - name: "Send code coverage report to Codecov.io"
         run: bash codecov -t ${{ secrets.CODECOV_TOKEN }}
-
-  mutation-tests:
-    name: "Mutation Tests"
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: "Checkout"
-        uses: actions/checkout@v2
-
-      - name: "Install PHP with extensions"
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-
-      - name: "Install locked dependencies with composer"
-        run: composer install --no-interaction --no-progress
-
-      - name: "Run mutation tests with infection/infection"
-        run: vendor/bin/infection --ignore-msi-with-no-mutations --min-covered-msi=80 --min-msi=80
-        env:
-          XDEBUG_MODE: coverage

@@ -6,7 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
-## 1.0.0
+## v1.2.0
+
+### Added
+
+- Added support for version `^2` of `thecodingmachine/safe`
+
+## v1.1.1
+
+### Fixed
+
+- Fix parsing of complex content types
+
+## v1.1.0
+
+### Added
+
+- Recognize `Content-Type: application/graphql+json` in `RequestParser`
+
+## v1.0.0
 
 ### Added
 

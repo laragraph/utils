@@ -10,7 +10,11 @@ use GraphQL\Server\RequestError;
 use GraphQL\Utils\Utils;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
+/**
+ * Follows https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md.
+ */
 class RequestParser
 {
     /**
@@ -26,9 +30,9 @@ class RequestParser
     /**
      * Converts an incoming HTTP request to one or more OperationParams.
      *
-     * @return \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>
-     *
      * @throws \GraphQL\Server\RequestError
+     *
+     * @return \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>
      */
     public function parseRequest(Request $request)
     {
@@ -37,7 +41,7 @@ class RequestParser
         /** @var array<string, mixed> $queryParams */
         $queryParams = $request->query();
 
-        if ($method === 'POST') {
+        if ('POST' === $method) {
             /**
              * Never null, since Symfony defaults to application/x-www-form-urlencoded.
              *
@@ -45,28 +49,28 @@ class RequestParser
              */
             $contentType = $request->header('Content-Type');
 
-            if (stripos($contentType, 'application/json') !== false) {
+            if (Str::startsWith($contentType, ['application/json', 'application/graphql+json'])) {
                 /** @var string $content */
                 $content = $request->getContent();
                 $bodyParams = \Safe\json_decode($content, true);
 
                 if (! is_array($bodyParams)) {
                     throw new RequestError(
-                        'GraphQL Server expects JSON object or array, but got '.
-                        Utils::printSafeJson($bodyParams)
+                        'GraphQL Server expects JSON object or array, but got '
+                        . Utils::printSafeJson($bodyParams)
                     );
                 }
-            } elseif (stripos($contentType, 'application/graphql') !== false) {
+            } elseif (Str::startsWith($contentType, 'application/graphql')) {
                 /** @var string $content */
                 $content = $request->getContent();
                 $bodyParams = ['query' => $content];
-            } elseif (stripos($contentType, 'application/x-www-form-urlencoded') !== false) {
+            } elseif (Str::startsWith($contentType, 'application/x-www-form-urlencoded')) {
                 /** @var array<string, mixed> $bodyParams */
                 $bodyParams = $request->post();
-            } elseif (stripos($contentType, 'multipart/form-data') !== false) {
+            } elseif (Str::startsWith($contentType, 'multipart/form-data')) {
                 $bodyParams = $this->inlineFiles($request);
             } else {
-                throw new RequestError('Unexpected content type: '.Utils::printSafeJson($contentType));
+                throw new RequestError('Unexpected content type: ' . Utils::printSafeJson($contentType));
             }
         }
 
@@ -76,14 +80,13 @@ class RequestParser
     /**
      * Inline file uploads given through a multipart request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array<mixed>
      */
     protected function inlineFiles(Request $request): array
     {
         /** @var string|null $mapParam */
         $mapParam = $request->post('map');
-        if ($mapParam === null) {
+        if (null === $mapParam) {
             throw new RequestError(
                 'Could not find a valid map, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec'
             );
@@ -91,7 +94,7 @@ class RequestParser
 
         /** @var string|null $operationsParam */
         $operationsParam = $request->post('operations');
-        if ($operationsParam === null) {
+        if (null === $operationsParam) {
             throw new RequestError(
                 'Could not find valid operations, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec'
             );
@@ -107,7 +110,6 @@ class RequestParser
             /** @var array<string> $operationsPaths */
             $file = $request->file((string) $fileKey);
 
-            /** @var string $operationsPath */
             foreach ($operationsPaths as $operationsPath) {
                 Arr::set($operations, $operationsPath, $file);
             }

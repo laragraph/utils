@@ -1,16 +1,13 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Laragraph\Utils;
 
 use GraphQL\Server\Helper;
-use GraphQL\Server\OperationParams;
-use GraphQL\Server\RequestError;
 use GraphQL\Utils\Utils;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Safe\Exceptions\JsonException;
 
 /**
  * Follows https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md.
@@ -30,7 +27,7 @@ class RequestParser
     /**
      * Converts an incoming HTTP request to one or more OperationParams.
      *
-     * @throws \GraphQL\Server\RequestError
+     * @throws \Laragraph\Utils\BadRequestGraphQLException
      *
      * @return \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>
      */
@@ -52,10 +49,14 @@ class RequestParser
             if (Str::startsWith($contentType, ['application/json', 'application/graphql+json'])) {
                 /** @var string $content */
                 $content = $request->getContent();
-                $bodyParams = \Safe\json_decode($content, true);
+                try {
+                    $bodyParams = \Safe\json_decode($content, true);
+                } catch (JsonException $e) {
+                    throw new BadRequestGraphQLException("Invalid JSON: {$e->getMessage()}");
+                }
 
                 if (! is_array($bodyParams)) {
-                    throw new RequestError(
+                    throw new BadRequestGraphQLException(
                         'GraphQL Server expects JSON object or array, but got '
                         . Utils::printSafeJson($bodyParams)
                     );
@@ -70,7 +71,7 @@ class RequestParser
             } elseif (Str::startsWith($contentType, 'multipart/form-data')) {
                 $bodyParams = $this->inlineFiles($request);
             } else {
-                throw new RequestError('Unexpected content type: ' . Utils::printSafeJson($contentType));
+                throw new BadRequestGraphQLException('Unexpected content type: ' . Utils::printSafeJson($contentType));
             }
         }
 
@@ -87,7 +88,7 @@ class RequestParser
         /** @var string|null $mapParam */
         $mapParam = $request->post('map');
         if (null === $mapParam) {
-            throw new RequestError(
+            throw new BadRequestGraphQLException(
                 'Could not find a valid map, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec'
             );
         }
@@ -95,7 +96,7 @@ class RequestParser
         /** @var string|null $operationsParam */
         $operationsParam = $request->post('operations');
         if (null === $operationsParam) {
-            throw new RequestError(
+            throw new BadRequestGraphQLException(
                 'Could not find valid operations, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec'
             );
         }

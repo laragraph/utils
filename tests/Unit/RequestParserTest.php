@@ -1,19 +1,16 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Laragraph\Utils\Tests\Unit;
 
 use GraphQL\Server\OperationParams;
-use GraphQL\Server\RequestError;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Laragraph\Utils\BadRequestGraphQLException;
 use Laragraph\Utils\RequestParser;
 use Orchestra\Testbench\TestCase;
-use Safe\Exceptions\JsonException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-class RequestParserTest extends TestCase
+final class RequestParserTest extends TestCase
 {
     public function testGetWithQuery(): void
     {
@@ -138,7 +135,7 @@ class RequestParserTest extends TestCase
         );
         $parser = new RequestParser();
 
-        $this->expectException(RequestError::class);
+        $this->expectException(BadRequestGraphQLException::class);
         $parser->parseRequest($request);
     }
 
@@ -175,7 +172,7 @@ class RequestParserTest extends TestCase
         );
         $parser = new RequestParser();
 
-        $this->expectException(JsonException::class);
+        $this->expectException(BadRequestGraphQLException::class);
         $parser->parseRequest($request);
     }
 
@@ -190,7 +187,7 @@ class RequestParserTest extends TestCase
         );
         $parser = new RequestParser();
 
-        $this->expectException(RequestError::class);
+        $this->expectException(BadRequestGraphQLException::class);
         $parser->parseRequest($request);
     }
 
@@ -258,7 +255,7 @@ class RequestParserTest extends TestCase
         );
         $parser = new RequestParser();
 
-        $this->expectException(RequestError::class);
+        $this->expectException(BadRequestGraphQLException::class);
         $parser->parseRequest($request);
     }
 
@@ -281,7 +278,7 @@ class RequestParserTest extends TestCase
 
         $parser = new RequestParser();
 
-        $this->expectException(RequestError::class);
+        $this->expectException(BadRequestGraphQLException::class);
         $parser->parseRequest($request);
     }
 

@@ -157,7 +157,6 @@ final class RequestParserTest extends TestCase
         $params = (new RequestParser())->parseRequest($request);
 
         self::assertInstanceOf(OperationParams::class, $params);
-        // @phpstan-ignore-next-line graphql-php is inaccurate
         self::assertNull($params->query);
     }
 

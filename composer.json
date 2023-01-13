@@ -19,7 +19,7 @@
     "illuminate/contracts": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8 || ^9",
     "illuminate/http": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8 || ^9",
     "thecodingmachine/safe": "^1.1 || ^2",
-    "webonyx/graphql-php": "^0.13.2 || ^14"
+    "webonyx/graphql-php": "^0.13.2 || ^14 || ^15"
   },
   "require-dev": {
     "ergebnis/composer-normalize": "^2.11",
@@ -53,6 +53,7 @@
     "allow-plugins": {
       "infection/extension-installer": true,
       "ergebnis/composer-normalize": true,
+      "kylekatarnls/update-helper": true,
       "phpstan/extension-installer": true
     },
     "preferred-install": "dist",

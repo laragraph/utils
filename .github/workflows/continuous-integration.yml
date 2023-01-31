@@ -69,6 +69,8 @@ jobs:
             laravel-version: "5.7.*"
           - php-version: "8.0"
             laravel-version: "5.8.*"
+          - php-version: "8.0"
+            laravel-version: "^10"
           - php-version: "8.1"
             laravel-version: "5.6.*"
           - php-version: "8.1"

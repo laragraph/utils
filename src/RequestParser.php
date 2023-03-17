@@ -5,6 +5,7 @@ namespace Laragraph\Utils;
 use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
+use GraphQL\Utils\Utils;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -117,6 +118,12 @@ class RequestParser
             return ['query' => $content];
         }
 
-        throw new BadRequestGraphQLException('Could not parse GraphQL request body');
+        if ($request->isJson()) {
+            throw new BadRequestGraphQLException(
+                'GraphQL Server expects JSON object or array, but got: ' . $request->getContent()
+            );
+        }
+
+        throw new BadRequestGraphQLException('Unexpected content type: ' . Utils::printSafeJson($contentType));
     }
 }

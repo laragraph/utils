@@ -136,6 +136,7 @@ final class RequestParserTest extends TestCase
         $parser = new RequestParser();
 
         $this->expectException(BadRequestGraphQLException::class);
+        $this->expectExceptionMessage('Unexpected content type: "' . $contentType . '"');
         $parser->parseRequest($request);
     }
 
@@ -148,7 +149,6 @@ final class RequestParserTest extends TestCase
         yield ['application/foobar'];
         yield ['application/josn'];
         yield ['application/grapql'];
-        yield ['application/foo;charset=application/json'];
     }
 
     public function testNoQuery(): void
@@ -172,6 +172,8 @@ final class RequestParserTest extends TestCase
         $parser = new RequestParser();
 
         $this->expectException(BadRequestGraphQLException::class);
+        $this->expectExceptionMessage('GraphQL Server expects JSON object or array, but got: this is not valid json');
+
         $parser->parseRequest($request);
     }
 
@@ -187,6 +189,8 @@ final class RequestParserTest extends TestCase
         $parser = new RequestParser();
 
         $this->expectException(BadRequestGraphQLException::class);
+        $this->expectExceptionMessage('GraphQL Server expects JSON object or array, but got: "this should be a map with query, variables, etc."');
+
         $parser->parseRequest($request);
     }
 

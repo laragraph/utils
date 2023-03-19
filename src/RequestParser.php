@@ -3,8 +3,6 @@
 namespace Laragraph\Utils;
 
 use GraphQL\Server\Helper;
-use GraphQL\Server\OperationParams;
-use GraphQL\Server\RequestError;
 use GraphQL\Utils\Utils;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -30,10 +28,10 @@ class RequestParser
     /**
      * Converts an incoming HTTP request to one or more OperationParams.
      *
-     * @throws RequestError
-     * @throws BadRequestGraphQLException
+     * @throws \GraphQL\Server\RequestError
+     * @throws \GraphQL\Server\BadRequestGraphQLException
      *
-     * @return OperationParams|array<int, OperationParams>
+     * @return \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>
      */
     public function parseRequest(Request $request)
     {

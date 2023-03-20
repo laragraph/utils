@@ -7,7 +7,8 @@ use GraphQL\Utils\Utils;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Safe\Exceptions\JsonException;
+
+use function Safe\json_decode;
 
 /**
  * Follows https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md.
@@ -27,6 +28,7 @@ class RequestParser
     /**
      * Converts an incoming HTTP request to one or more OperationParams.
      *
+     * @throws \GraphQL\Server\RequestError
      * @throws \Laragraph\Utils\BadRequestGraphQLException
      *
      * @return \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>
@@ -34,46 +36,11 @@ class RequestParser
     public function parseRequest(Request $request)
     {
         $method = $request->getMethod();
-        $bodyParams = [];
-        /** @var array<string, mixed> $queryParams */
+        $bodyParams = 'POST' === $method
+            ? $this->bodyParams($request)
+            : [];
+        /** @var array<string, mixed> $queryParams Laravel type is not precise enough */
         $queryParams = $request->query();
-
-        if ('POST' === $method) {
-            /**
-             * Never null, since Symfony defaults to application/x-www-form-urlencoded.
-             *
-             * @var string $contentType
-             */
-            $contentType = $request->header('Content-Type');
-
-            if (Str::startsWith($contentType, ['application/json', 'application/graphql+json'])) {
-                /** @var string $content */
-                $content = $request->getContent();
-                try {
-                    $bodyParams = \Safe\json_decode($content, true);
-                } catch (JsonException $e) {
-                    throw new BadRequestGraphQLException("Invalid JSON: {$e->getMessage()}");
-                }
-
-                if (! is_array($bodyParams)) {
-                    throw new BadRequestGraphQLException(
-                        'GraphQL Server expects JSON object or array, but got '
-                        . Utils::printSafeJson($bodyParams)
-                    );
-                }
-            } elseif (Str::startsWith($contentType, 'application/graphql')) {
-                /** @var string $content */
-                $content = $request->getContent();
-                $bodyParams = ['query' => $content];
-            } elseif (Str::startsWith($contentType, 'application/x-www-form-urlencoded')) {
-                /** @var array<string, mixed> $bodyParams */
-                $bodyParams = $request->post();
-            } elseif (Str::startsWith($contentType, 'multipart/form-data')) {
-                $bodyParams = $this->inlineFiles($request);
-            } else {
-                throw new BadRequestGraphQLException('Unexpected content type: ' . Utils::printSafeJson($contentType));
-            }
-        }
 
         return $this->helper->parseRequestParams($method, $bodyParams, $queryParams);
     }
@@ -88,24 +55,20 @@ class RequestParser
         /** @var string|null $mapParam */
         $mapParam = $request->post('map');
         if (null === $mapParam) {
-            throw new BadRequestGraphQLException(
-                'Could not find a valid map, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec'
-            );
+            throw new BadRequestGraphQLException('Could not find a valid map, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec');
         }
 
         /** @var string|null $operationsParam */
         $operationsParam = $request->post('operations');
         if (null === $operationsParam) {
-            throw new BadRequestGraphQLException(
-                'Could not find valid operations, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec'
-            );
+            throw new BadRequestGraphQLException('Could not find valid operations, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec');
         }
 
         /** @var array<string, mixed>|array<int, array<string, mixed>> $operations */
-        $operations = \Safe\json_decode($operationsParam, true);
+        $operations = json_decode($operationsParam, true);
 
         /** @var array<int|string, array<int, string>> $map */
-        $map = \Safe\json_decode($mapParam, true);
+        $map = json_decode($mapParam, true);
 
         foreach ($map as $fileKey => $operationsPaths) {
             /** @var array<string> $operationsPaths */
@@ -117,5 +80,36 @@ class RequestParser
         }
 
         return $operations;
+    }
+
+    /**
+     * Extracts the body parameters from the request.
+     *
+     * @return array<mixed>
+     */
+    protected function bodyParams(Request $request): array
+    {
+        $contentType = $request->header('Content-Type');
+        assert(is_string($contentType), 'Never null, since Symfony defaults to application/x-www-form-urlencoded.');
+
+        if (Str::startsWith($contentType, 'multipart/form-data')) {
+            return $this->inlineFiles($request);
+        }
+
+        $bodyParams = $request->input();
+
+        if (is_array($bodyParams) && Arr::isAssoc($bodyParams)) {
+            return $bodyParams;
+        }
+
+        if (Str::startsWith($contentType, 'application/graphql')) {
+            return ['query' => $request->getContent()];
+        }
+
+        if ($request->isJson()) {
+            throw new BadRequestGraphQLException("GraphQL Server expects JSON object or array, but got: {$request->getContent()}.");
+        }
+
+        throw new BadRequestGraphQLException('Unexpected content type: ' . Utils::printSafeJson($contentType));
     }
 }

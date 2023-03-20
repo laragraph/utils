@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## v2.0.0
+
+### Changed
+
 - Rely on `$request->input()` instead of manually json decoding request body https://github.com/laragraph/utils/pull/12
 
 ## v1.6.0

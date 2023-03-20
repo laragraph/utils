@@ -3,7 +3,6 @@
 namespace Laragraph\Utils;
 
 use GraphQL\Server\Helper;
-use GraphQL\Utils\Utils;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -46,6 +45,37 @@ class RequestParser
     }
 
     /**
+     * Extracts the body parameters from the request.
+     *
+     * @return array<mixed>
+     */
+    protected function bodyParams(Request $request): array
+    {
+        $contentType = $request->header('Content-Type');
+        assert(is_string($contentType), 'Never null, since Symfony defaults to application/x-www-form-urlencoded.');
+
+        if (Str::startsWith($contentType, 'multipart/form-data')) {
+            return $this->inlineFiles($request);
+        }
+
+        $bodyParams = $request->input();
+
+        if (is_array($bodyParams) && Arr::isAssoc($bodyParams)) {
+            return $bodyParams;
+        }
+
+        if (Str::startsWith($contentType, 'application/graphql')) {
+            return ['query' => $request->getContent()];
+        }
+
+        if ($request->isJson()) {
+            throw new BadRequestGraphQLException("GraphQL Server expects JSON object or array, but got: {$request->getContent()}.");
+        }
+
+        throw new BadRequestGraphQLException("Could not decode request with content type: \"{$contentType}\".");
+    }
+
+    /**
      * Inline file uploads given through a multipart request.
      *
      * @return array<mixed>
@@ -80,36 +110,5 @@ class RequestParser
         }
 
         return $operations;
-    }
-
-    /**
-     * Extracts the body parameters from the request.
-     *
-     * @return array<mixed>
-     */
-    protected function bodyParams(Request $request): array
-    {
-        $contentType = $request->header('Content-Type');
-        assert(is_string($contentType), 'Never null, since Symfony defaults to application/x-www-form-urlencoded.');
-
-        if (Str::startsWith($contentType, 'multipart/form-data')) {
-            return $this->inlineFiles($request);
-        }
-
-        $bodyParams = $request->input();
-
-        if (is_array($bodyParams) && Arr::isAssoc($bodyParams)) {
-            return $bodyParams;
-        }
-
-        if (Str::startsWith($contentType, 'application/graphql')) {
-            return ['query' => $request->getContent()];
-        }
-
-        if ($request->isJson()) {
-            throw new BadRequestGraphQLException("GraphQL Server expects JSON object or array, but got: {$request->getContent()}.");
-        }
-
-        throw new BadRequestGraphQLException('Unexpected content type: ' . Utils::printSafeJson($contentType));
     }
 }

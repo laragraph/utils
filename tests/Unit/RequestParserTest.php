@@ -136,7 +136,7 @@ final class RequestParserTest extends TestCase
         $parser = new RequestParser();
 
         $this->expectException(BadRequestGraphQLException::class);
-        $this->expectExceptionMessage('Unexpected content type: "' . $contentType . '"');
+        $this->expectExceptionMessage("Could not decode request with content type: \"{$contentType}\"");
         $parser->parseRequest($request);
     }
 

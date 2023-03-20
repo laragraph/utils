@@ -103,10 +103,7 @@ class RequestParser
         }
 
         if (Str::startsWith($contentType, 'application/graphql')) {
-            $content = $request->getContent();
-            assert(is_string($content));
-
-            return ['query' => $content];
+            return ['query' => $request->getContent()];
         }
 
         if ($request->isJson()) {

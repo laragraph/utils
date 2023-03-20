@@ -64,20 +64,19 @@ class RequestParser
 
         $bodyParams = $request->input();
 
-        if (is_array($bodyParams)) {
+        if (is_array($bodyParams) && count($bodyParams) > 0) {
             if (Arr::isAssoc($bodyParams)) {
                 return $bodyParams;
             }
-            if (count($bodyParams) > 0) {
-                $allAssoc = true;
-                foreach ($bodyParams as $bodyParam) {
-                    if (! is_array($bodyParam) || ! Arr::isAssoc($bodyParam)) {
-                        $allAssoc = false;
-                    }
+
+            $allAssoc = true;
+            foreach ($bodyParams as $bodyParam) {
+                if (! is_array($bodyParam) || ! Arr::isAssoc($bodyParam)) {
+                    $allAssoc = false;
                 }
-                if ($allAssoc) {
-                    return $bodyParams;
-                }
+            }
+            if ($allAssoc) {
+                return $bodyParams;
             }
         }
 

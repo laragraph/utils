@@ -29,7 +29,7 @@ class RequestParser
      * Converts an incoming HTTP request to one or more OperationParams.
      *
      * @throws \GraphQL\Server\RequestError
-     * @throws \GraphQL\Server\BadRequestGraphQLException
+     * @throws \Laragraph\Utils\BadRequestGraphQLException
      *
      * @return \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>
      */

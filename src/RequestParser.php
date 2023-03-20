@@ -58,14 +58,26 @@ class RequestParser
             return $this->inlineFiles($request);
         }
 
-        $bodyParams = $request->input();
-
-        if (is_array($bodyParams) && Arr::isAssoc($bodyParams)) {
-            return $bodyParams;
+        if (Str::startsWith($contentType, 'application/graphql') && ! $request->isJson()) {
+            return ['query' => $request->getContent()];
         }
 
-        if (Str::startsWith($contentType, 'application/graphql')) {
-            return ['query' => $request->getContent()];
+        $bodyParams = $request->input();
+
+        if (is_array($bodyParams)) {
+            if (Arr::isAssoc($bodyParams)) {
+                return $bodyParams;
+            } elseif (count($bodyParams) > 0) {
+                $allAssoc = true;
+                foreach ($bodyParams as $bodyParam) {
+                    if (! is_array($bodyParam) || ! Arr::isAssoc($bodyParam)) {
+                        $allAssoc = false;
+                    }
+                }
+                if ($allAssoc) {
+                    return $bodyParams;
+                }
+            }
         }
 
         if ($request->isJson()) {

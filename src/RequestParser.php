@@ -67,7 +67,8 @@ class RequestParser
         if (is_array($bodyParams)) {
             if (Arr::isAssoc($bodyParams)) {
                 return $bodyParams;
-            } elseif (count($bodyParams) > 0) {
+            }
+            if (count($bodyParams) > 0) {
                 $allAssoc = true;
                 foreach ($bodyParams as $bodyParam) {
                     if (! is_array($bodyParam) || ! Arr::isAssoc($bodyParam)) {

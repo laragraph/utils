@@ -90,6 +90,8 @@ class RequestParser
     /**
      * Inline file uploads given through a multipart request.
      *
+     * Follows https://github.com/jaydenseric/graphql-multipart-request-spec.
+     *
      * @return array<mixed>
      */
     protected function inlineFiles(Request $request): array

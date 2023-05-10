@@ -6,6 +6,7 @@ use GraphQL\Server\Helper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Safe\Exceptions\JsonException;
 
 use function Safe\json_decode;
 
@@ -99,26 +100,48 @@ class RequestParser
         /** @var string|null $mapParam */
         $mapParam = $request->post('map');
         if (null === $mapParam) {
-            throw new BadRequestGraphQLException('Could not find a valid map, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec');
+            throw new BadMultipartRequestGraphQLException('Could not find a valid map.');
         }
 
         /** @var string|null $operationsParam */
         $operationsParam = $request->post('operations');
         if (null === $operationsParam) {
-            throw new BadRequestGraphQLException('Could not find valid operations, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec');
+            throw new BadMultipartRequestGraphQLException('Could not find a valid operations.');
         }
 
-        /** @var array<string, mixed>|array<int, array<string, mixed>> $operations */
-        $operations = json_decode($operationsParam, true);
+        try {
+            /** Should be array<string, mixed>|array<int, array<string, mixed>>, but it's user input so can be anything */
+            $operations = json_decode($operationsParam, true);
+        } catch (JsonException $e) {
+            throw new BadMultipartRequestGraphQLException('Could not find a valid operations.');
+        }
 
-        /** @var array<int|string, array<int, string>> $map */
-        $map = json_decode($mapParam, true);
+        if (! is_array($operations)) {
+            throw new BadMultipartRequestGraphQLException('Could not find a valid operations.');
+        }
+
+        try {
+            /** Should be array<int|string, array<int, string>>, but it's user input so can be anything */
+            $map = json_decode($mapParam, true);
+        } catch (JsonException $e) {
+            throw new BadMultipartRequestGraphQLException('Could not find a valid map.');
+        }
+
+        if (! is_array($map)) {
+            throw new BadMultipartRequestGraphQLException('Could not find a valid map.');
+        }
 
         foreach ($map as $fileKey => $operationsPaths) {
-            /** @var array<string> $operationsPaths */
             $file = $request->file((string) $fileKey);
 
+            if (! is_iterable($operationsPaths)) {
+                throw new BadMultipartRequestGraphQLException('Could not find a valid map.');
+            }
+
             foreach ($operationsPaths as $operationsPath) {
+                if (! is_string($operationsPath)) {
+                    throw new BadMultipartRequestGraphQLException('Could not find a valid map.');
+                }
                 Arr::set($operations, $operationsPath, $file);
             }
         }

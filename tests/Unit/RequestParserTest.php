@@ -5,6 +5,7 @@ namespace Laragraph\Utils\Tests\Unit;
 use GraphQL\Server\OperationParams;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Laragraph\Utils\BadMultipartRequestGraphQLException;
 use Laragraph\Utils\BadRequestGraphQLException;
 use Laragraph\Utils\RequestParser;
 use Orchestra\Testbench\TestCase;
@@ -268,20 +269,44 @@ final class RequestParserTest extends TestCase
         yield ['multipart/form-data; boundary=----WebkitFormBoundaryasodfh98ho1hfdsdfadfNX'];
     }
 
-    public function testMultipartFormWithoutMap(): void
+    public function testMultipartFormMapsAndOperationsDontMatch(): void
     {
+        $file = UploadedFile::fake()->create('image.jpg', 500);
+
         $request = $this->makeRequest(
             'POST',
-            [],
-            [],
+            [
+                'operations' => /** @lang JSON */ '
+                    {
+                        "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
+                        "variables": {
+                            "file": "test"
+                        }
+                    }
+                ',
+                'map' => /** @lang JSON */ '
+                    {
+                        "0": ["variables.file.0"]
+                    }
+                ',
+            ],
+            [
+                '0' => $file,
+            ],
             [
                 'Content-Type' => 'multipart/form-data',
             ]
         );
-        $parser = new RequestParser();
 
-        $this->expectException(BadRequestGraphQLException::class);
-        $parser->parseRequest($request);
+        $params = (new RequestParser())->parseRequest($request);
+
+        self::assertInstanceOf(OperationParams::class, $params);
+        self::assertSame(/** @lang GraphQL */ 'mutation Upload($file: Upload!) { upload(file: $file) }', $params->query);
+
+        $variables = $params->variables;
+        self::assertNotNull($variables);
+        /** @var array<string, array<mixed>> $variables */
+        self::assertSame($file, $variables['file'][0]);
     }
 
     public function testMultipartFormWithoutOperations(): void
@@ -303,7 +328,191 @@ final class RequestParserTest extends TestCase
 
         $parser = new RequestParser();
 
-        $this->expectException(BadRequestGraphQLException::class);
+        $this->expectException(BadMultipartRequestGraphQLException::class);
+        $parser->parseRequest($request);
+    }
+
+    public function testMultipartFormWithNonJsonOperations(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [
+                'operations' => '1,2,3',
+                'map' => /** @lang JSON */ '
+                    {
+                        "0": ["variables.file"]
+                    }
+                ',
+            ],
+            [],
+            [
+                'Content-Type' => 'multipart/form-data',
+            ]
+        );
+
+        $parser = new RequestParser();
+
+        $this->expectException(BadMultipartRequestGraphQLException::class);
+        $parser->parseRequest($request);
+    }
+
+    public function testMultipartFormWithNonArrayOperations(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [
+                'operations' => /** @lang JSON */ '
+                    "query {id}"
+                ',
+                'map' => /** @lang JSON */ '
+                    {
+                        "0": ["variables.file"]
+                    }
+                ',
+            ],
+            [],
+            [
+                'Content-Type' => 'multipart/form-data',
+            ]
+        );
+
+        $parser = new RequestParser();
+
+        $this->expectException(BadMultipartRequestGraphQLException::class);
+        $parser->parseRequest($request);
+    }
+
+    public function testMultipartFormWithoutMap(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [],
+            [],
+            [
+                'Content-Type' => 'multipart/form-data',
+            ]
+        );
+        $parser = new RequestParser();
+
+        $this->expectException(BadMultipartRequestGraphQLException::class);
+        $parser->parseRequest($request);
+    }
+
+    public function testMultipartFormWithNonArrayMap(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [
+                'operations' => /** @lang JSON */ '
+                    {
+                        "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
+                        "variables": {
+                            "file": null
+                        }
+                    }
+                ',
+                'map' => /** @lang JSON */ '
+                    "test"
+                ',
+            ],
+            [],
+            [
+                'Content-Type' => 'multipart/form-data',
+            ]
+        );
+
+        $parser = new RequestParser();
+
+        $this->expectException(BadMultipartRequestGraphQLException::class);
+        $parser->parseRequest($request);
+    }
+
+    public function testMultipartFormWithWrongMapElements(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [
+                'operations' => /** @lang JSON */ '
+                    {
+                        "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
+                        "variables": {
+                            "file": null
+                        }
+                    }
+                ',
+                'map' => /** @lang JSON */ '
+                    {
+                        "0": "variables.file"
+                    }
+                ',
+            ],
+            [],
+            [
+                'Content-Type' => 'multipart/form-data',
+            ]
+        );
+
+        $parser = new RequestParser();
+
+        $this->expectException(BadMultipartRequestGraphQLException::class);
+        $parser->parseRequest($request);
+    }
+
+    public function testMultipartFormWithWrongMapSubElements(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [
+                'operations' => /** @lang JSON */ '
+                    {
+                        "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
+                        "variables": {
+                            "file": null
+                        }
+                    }
+                ',
+                'map' => '1,2,3',
+            ],
+            [],
+            [
+                'Content-Type' => 'multipart/form-data',
+            ]
+        );
+
+        $parser = new RequestParser();
+
+        $this->expectException(BadMultipartRequestGraphQLException::class);
+        $parser->parseRequest($request);
+    }
+
+    public function testMultipartFormWithNonJsonMap(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [
+                'operations' => /** @lang JSON */ '
+                    {
+                        "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
+                        "variables": {
+                            "file": null
+                        }
+                    }
+                ',
+                'map' => /** @lang JSON */ '
+                    {
+                        "0": [["variables.file"]]
+                    }
+                ',
+            ],
+            [],
+            [
+                'Content-Type' => 'multipart/form-data',
+            ]
+        );
+
+        $parser = new RequestParser();
+
+        $this->expectException(BadMultipartRequestGraphQLException::class);
         $parser->parseRequest($request);
     }
 

@@ -6,3 +6,14 @@ parameters:
 	- src
 	- tests
 	tmpDir: %currentWorkingDirectory%/.build/phpstan
+	exceptions:
+		checkedExceptionRegexes:
+			- '#.*#'
+		check:
+			missingCheckedExceptionInThrows: true
+
+	ignoreErrors:
+		-
+			message: "#Method .* throws checked exception .* but it's missing from the PHPDoc @throws tag.#"
+			paths:
+				- tests/*

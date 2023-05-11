@@ -30,6 +30,7 @@ class RequestParser
      *
      * @throws \GraphQL\Server\RequestError
      * @throws \Laragraph\Utils\BadRequestGraphQLException
+     * @throws \Laragraph\Utils\BadMultipartRequestGraphQLException
      *
      * @return \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>
      */
@@ -47,6 +48,9 @@ class RequestParser
 
     /**
      * Extracts the body parameters from the request.
+     *
+     * @throws \Laragraph\Utils\BadMultipartRequestGraphQLException
+     * @throws \Laragraph\Utils\BadRequestGraphQLException
      *
      * @return array<mixed>
      */
@@ -93,7 +97,7 @@ class RequestParser
      *
      * Follows https://github.com/jaydenseric/graphql-multipart-request-spec.
      *
-     * @throws BadMultipartRequestGraphQLException
+     * @throws \Laragraph\Utils\BadMultipartRequestGraphQLException
      *
      * @return array<mixed>
      */

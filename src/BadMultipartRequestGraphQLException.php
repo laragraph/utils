@@ -12,7 +12,7 @@ class BadMultipartRequestGraphQLException extends BadRequestHttpException
     public function __construct(string $message, \Throwable $previous = null, int $code = 0, array $headers = [])
     {
         parent::__construct(
-            $message . ' Be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec',
+            $message . ' Be sure to conform to the GraphQL multipart request specification (https://github.com/jaydenseric/graphql-multipart-request-spec).',
             $previous,
             $code,
             $headers

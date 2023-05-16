@@ -103,54 +103,60 @@ class RequestParser
      */
     protected function inlineFiles(Request $request): array
     {
-        /** @var string|null $mapParam */
         $mapParam = $request->post('map');
         if (null === $mapParam) {
-            throw new BadMultipartRequestGraphQLException('Could not find a valid map.');
+            throw new BadMultipartRequestGraphQLException('Missing parameter map.');
+        }
+        if (! is_string($mapParam)) {
+            $mapParamType = gettype($mapParam);
+            throw new BadMultipartRequestGraphQLException("Expected parameter map to be a JSON string, got: {$mapParamType}.");
         }
 
-        /** @var string|null $operationsParam */
         $operationsParam = $request->post('operations');
         if (null === $operationsParam) {
-            throw new BadMultipartRequestGraphQLException('Could not find a valid operations.');
+            throw new BadMultipartRequestGraphQLException('Missing parameter operations.');
+        }
+        if (! is_string($operationsParam)) {
+            $operationsParamType = gettype($operationsParam);
+            throw new BadMultipartRequestGraphQLException("Expected parameter operations to be a JSON string, got: {$operationsParamType}.");
         }
 
         try {
-            /** Should be array<string, mixed>|array<int, array<string, mixed>>, but it's user input so can be anything */
+            /** Should be array<string, mixed>|array<int, array<string, mixed>>, but it's user input, so it can be anything. */
             $operations = json_decode($operationsParam, true);
         } catch (JsonException $e) {
-            throw new BadMultipartRequestGraphQLException('Parameter operations is not a valid json.', $e);
+            throw new BadMultipartRequestGraphQLException('Parameter operations is not valid JSON.', $e);
         }
 
         if (! is_array($operations)) {
-            $type = gettype($operations);
-            throw new BadMultipartRequestGraphQLException("Expected operations to be array, got: {$type}.");
+            $operationsType = gettype($operations);
+            throw new BadMultipartRequestGraphQLException("Expected parameter operations to be array, got: {$operationsType}.");
         }
 
         try {
-            /** Should be array<int|string, array<int, string>>, but it's user input so can be anything */
+            /** Should be array<int|string, array<int, string>>, but it's user input, so it can be anything */
             $map = json_decode($mapParam, true);
         } catch (JsonException $e) {
-            throw new BadMultipartRequestGraphQLException('Parameter map is not a valid json.', $e);
+            throw new BadMultipartRequestGraphQLException('Parameter map is not valid JSON.', $e);
         }
 
         if (! is_array($map)) {
-            $type = gettype($map);
-            throw new BadMultipartRequestGraphQLException("Expected map to be array, got: {$type}.");
+            $mapType = gettype($map);
+            throw new BadMultipartRequestGraphQLException("Expected parameter map to be array, got: {$mapType}.");
         }
 
         foreach ($map as $fileKey => $operationsPaths) {
             $file = $request->file((string) $fileKey);
 
             if (! is_iterable($operationsPaths)) {
-                $type = gettype($operationsPaths);
-                throw new BadMultipartRequestGraphQLException("Expected map to be array of arrays, got: {$type}");
+                $operationsPathsType = gettype($operationsPaths);
+                throw new BadMultipartRequestGraphQLException("Expected map to be array of arrays, got: {$operationsPathsType}.");
             }
 
             foreach ($operationsPaths as $operationsPath) {
                 if (! is_string($operationsPath)) {
-                    $type = gettype($operationsPath);
-                    throw new BadMultipartRequestGraphQLException("Expected map to be array of arrays of strings, got {$type}");
+                    $operationsPathType = gettype($operationsPath);
+                    throw new BadMultipartRequestGraphQLException("Expected map to be array of arrays of strings, got {$operationsPathType}.");
                 }
                 Arr::set($operations, $operationsPath, $file);
             }

@@ -6,6 +6,7 @@ use GraphQL\Server\Helper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Safe\Exceptions\JsonException;
 
 use function Safe\json_decode;
 
@@ -29,6 +30,7 @@ class RequestParser
      *
      * @throws \GraphQL\Server\RequestError
      * @throws \Laragraph\Utils\BadRequestGraphQLException
+     * @throws \Laragraph\Utils\BadMultipartRequestGraphQLException
      *
      * @return \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>
      */
@@ -46,6 +48,9 @@ class RequestParser
 
     /**
      * Extracts the body parameters from the request.
+     *
+     * @throws \Laragraph\Utils\BadMultipartRequestGraphQLException
+     * @throws \Laragraph\Utils\BadRequestGraphQLException
      *
      * @return array<mixed>
      */
@@ -92,6 +97,8 @@ class RequestParser
      *
      * Follows https://github.com/jaydenseric/graphql-multipart-request-spec.
      *
+     * @throws \Laragraph\Utils\BadMultipartRequestGraphQLException
+     *
      * @return array<mixed>
      */
     protected function inlineFiles(Request $request): array
@@ -99,26 +106,52 @@ class RequestParser
         /** @var string|null $mapParam */
         $mapParam = $request->post('map');
         if (null === $mapParam) {
-            throw new BadRequestGraphQLException('Could not find a valid map, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec');
+            throw new BadMultipartRequestGraphQLException('Could not find a valid map.');
         }
 
         /** @var string|null $operationsParam */
         $operationsParam = $request->post('operations');
         if (null === $operationsParam) {
-            throw new BadRequestGraphQLException('Could not find valid operations, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec');
+            throw new BadMultipartRequestGraphQLException('Could not find a valid operations.');
         }
 
-        /** @var array<string, mixed>|array<int, array<string, mixed>> $operations */
-        $operations = json_decode($operationsParam, true);
+        try {
+            /** Should be array<string, mixed>|array<int, array<string, mixed>>, but it's user input so can be anything */
+            $operations = json_decode($operationsParam, true);
+        } catch (JsonException $e) {
+            throw new BadMultipartRequestGraphQLException('Parameter operations is not a valid json.', $e);
+        }
 
-        /** @var array<int|string, array<int, string>> $map */
-        $map = json_decode($mapParam, true);
+        if (! is_array($operations)) {
+            $type = gettype($operations);
+            throw new BadMultipartRequestGraphQLException("Expected operations to be array, got: {$type}.");
+        }
+
+        try {
+            /** Should be array<int|string, array<int, string>>, but it's user input so can be anything */
+            $map = json_decode($mapParam, true);
+        } catch (JsonException $e) {
+            throw new BadMultipartRequestGraphQLException('Parameter map is not a valid json.', $e);
+        }
+
+        if (! is_array($map)) {
+            $type = gettype($map);
+            throw new BadMultipartRequestGraphQLException("Expected map to be array, got: {$type}.");
+        }
 
         foreach ($map as $fileKey => $operationsPaths) {
-            /** @var array<string> $operationsPaths */
             $file = $request->file((string) $fileKey);
 
+            if (! is_iterable($operationsPaths)) {
+                $type = gettype($operationsPaths);
+                throw new BadMultipartRequestGraphQLException("Expected map to be array of arrays, got: {$type}");
+            }
+
             foreach ($operationsPaths as $operationsPath) {
+                if (! is_string($operationsPath)) {
+                    $type = gettype($operationsPath);
+                    throw new BadMultipartRequestGraphQLException("Expected map to be array of arrays of strings, got {$type}");
+                }
                 Arr::set($operations, $operationsPath, $file);
             }
         }

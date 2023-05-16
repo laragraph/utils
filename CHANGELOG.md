@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+
+- Throw `BadMultipartRequestGraphQLException` on wrong map/operation in `multipart/form-data` requests https://github.com/laragraph/utils/pull/14
+
 ## v2.0.1
 
 ### Fixed

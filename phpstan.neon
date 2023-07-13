@@ -1,17 +1,20 @@
 includes:
 - vendor/phpstan/phpstan/conf/bleedingEdge.neon
 parameters:
-	level: max
+  level: max
+  paths:
+  - src
+  - tests
+  tmpDir: %currentWorkingDirectory%/.build/phpstan
+  exceptions:
+	checkedExceptionRegexes:
+    - '#.*#'
+	check:
+	  missingCheckedExceptionInThrows: true
+  ignoreErrors:
+  - message: "#Method .* throws checked exception .* but it's missing from the PHPDoc @throws tag.#"
 	paths:
-	- src
-	- tests
-	tmpDir: %currentWorkingDirectory%/.build/phpstan
-	exceptions:
-		checkedExceptionRegexes:
-			- '#.*#'
-		check:
-			missingCheckedExceptionInThrows: true
-	ignoreErrors:
-	- message: "#Method .* throws checked exception .* but it's missing from the PHPDoc @throws tag.#"
-	  paths:
-	  - tests/*
+	- tests/*
+  # Install https://plugins.jetbrains.com/plugin/7677-awesome-console to make those links clickable
+  editorUrl: '%%relFile%%:%%line%%'
+  editorUrlTitle: '%%relFile%%:%%line%%'

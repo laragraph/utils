@@ -3,9 +3,7 @@ it: fix stan test ## Runs all common targets
 
 .PHONY: coverage
 coverage: vendor ## Collects coverage from running unit tests with phpunit
-	mkdir -p .build/phpunit
-	vendor/bin/phpunit --dump-xdebug-filter=.build/phpunit/xdebug-filter.php
-	vendor/bin/phpunit --coverage-text --prepend=.build/phpunit/xdebug-filter.php
+	vendor/bin/phpunit --coverage-text
 
 .PHONY: fix
 fix: vendor ## Fix the codestyle
@@ -18,12 +16,10 @@ help: ## Displays this list of targets with descriptions
 
 .PHONY: stan
 stan: vendor ## Runs a static analysis with phpstan
-	mkdir -p .build/phpstan
-	vendor/bin/phpstan analyse --configuration=phpstan.neon
+	vendor/bin/phpstan analyse
 
 .PHONY: test
 test: vendor ## Runs auto-review, unit, and integration tests with phpunit
-	mkdir -p .build/phpunit
 	vendor/bin/phpunit
 
 vendor: composer.json

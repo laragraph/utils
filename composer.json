@@ -51,8 +51,8 @@
   },
   "config": {
     "allow-plugins": {
-      "infection/extension-installer": true,
       "ergebnis/composer-normalize": true,
+      "infection/extension-installer": true,
       "kylekatarnls/update-helper": true,
       "phpstan/extension-installer": true
     },

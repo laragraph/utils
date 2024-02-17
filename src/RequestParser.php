@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Safe\Exceptions\JsonException;
-
 use function Safe\json_decode;
 
 /**

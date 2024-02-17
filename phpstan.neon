@@ -14,6 +14,9 @@ parameters:
   - message: "#Method .* throws checked exception .* but it's missing from the PHPDoc @throws tag.#"
     paths:
     - tests/*
+  - message: "#@dataProvider .* related method must be static in PHPUnit 10 and newer.#"
+    paths:
+    - tests/*
   # Install https://plugins.jetbrains.com/plugin/7677-awesome-console to make those links clickable
   editorUrl: '%%relFile%%:%%line%%'
   editorUrlTitle: '%%relFile%%:%%line%%'

@@ -9,9 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## v2.1.0
+
 ### Added
 
-- Support Laravel 11
+- Support Laravel 11 https://github.com/laragraph/utils/pull/16
 
 ## v2.0.3
 

@@ -46,7 +46,7 @@ final class RequestParserTest extends TestCase
     /**
      * @return iterable<array{string}>
      */
-    public function jsonLikeContentTypes(): iterable
+    public static function jsonLikeContentTypes(): iterable
     {
         yield ['application/json'];
         yield ['application/graphql+json'];
@@ -75,7 +75,7 @@ final class RequestParserTest extends TestCase
     /**
      * @return iterable<array{string}>
      */
-    public function graphQLContentTypes(): iterable
+    public static function graphQLContentTypes(): iterable
     {
         yield ['application/graphql'];
         yield ['application/graphql;charset=UTF-8'];
@@ -103,7 +103,7 @@ final class RequestParserTest extends TestCase
     /**
      * @return iterable<array{string}>
      */
-    public function formContentTypes(): iterable
+    public static function formContentTypes(): iterable
     {
         yield ['application/x-www-form-urlencoded'];
         yield ['application/x-www-form-urlencoded;bla;blub'];
@@ -166,7 +166,7 @@ final class RequestParserTest extends TestCase
     /**
      * @return iterable<array{string}>
      */
-    public function nonsensicalContentTypes(): iterable
+    public static function nonsensicalContentTypes(): iterable
     {
         yield ['foobar'];
         yield ['application/foobar'];
@@ -263,7 +263,7 @@ final class RequestParserTest extends TestCase
     /**
      * @return iterable<array{string}>
      */
-    public function multipartFormContentTypes(): iterable
+    public static function multipartFormContentTypes(): iterable
     {
         yield ['multipart/form-data'];
         yield ['multipart/form-data; boundary=----WebkitFormBoundaryasodfh98ho1hfdsdfadfNX'];

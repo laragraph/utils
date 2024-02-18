@@ -16,7 +16,7 @@ jobs:
       - name: "Install PHP with extensions"
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: 8.3
 
       - name: "Install locked dependencies with composer"
         run: composer install --no-interaction --no-progress
@@ -144,7 +144,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           coverage: pcov
-          php-version: 8.1
+          php-version: 8.3
 
       - name: "Install locked dependencies with composer"
         run: composer install --no-interaction --no-progress

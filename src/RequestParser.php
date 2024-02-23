@@ -9,14 +9,10 @@ use Illuminate\Support\Str;
 use Safe\Exceptions\JsonException;
 use function Safe\json_decode;
 
-/**
- * Follows https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md.
- */
+/** Follows https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md. */
 class RequestParser
 {
-    /**
-     * @var \GraphQL\Server\Helper
-     */
+    /** @var Helper */
     protected $helper;
 
     public function __construct()
@@ -28,8 +24,8 @@ class RequestParser
      * Converts an incoming HTTP request to one or more OperationParams.
      *
      * @throws \GraphQL\Server\RequestError
-     * @throws \Laragraph\Utils\BadRequestGraphQLException
-     * @throws \Laragraph\Utils\BadMultipartRequestGraphQLException
+     * @throws BadRequestGraphQLException
+     * @throws BadMultipartRequestGraphQLException
      *
      * @return \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>
      */
@@ -48,8 +44,8 @@ class RequestParser
     /**
      * Extracts the body parameters from the request.
      *
-     * @throws \Laragraph\Utils\BadMultipartRequestGraphQLException
-     * @throws \Laragraph\Utils\BadRequestGraphQLException
+     * @throws BadMultipartRequestGraphQLException
+     * @throws BadRequestGraphQLException
      *
      * @return array<mixed>
      */
@@ -96,7 +92,7 @@ class RequestParser
      *
      * Follows https://github.com/jaydenseric/graphql-multipart-request-spec.
      *
-     * @throws \Laragraph\Utils\BadMultipartRequestGraphQLException
+     * @throws BadMultipartRequestGraphQLException
      *
      * @return array<mixed>
      */

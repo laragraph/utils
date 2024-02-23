@@ -24,9 +24,7 @@ final class RequestParserTest extends TestCase
         self::assertSame($query, $params->query);
     }
 
-    /**
-     * @dataProvider jsonLikeContentTypes
-     */
+    /** @dataProvider jsonLikeContentTypes */
     public function testPostWithJsonLike(string $contentType): void
     {
         $query = /** @lang GraphQL */ '{ foo }';
@@ -43,9 +41,7 @@ final class RequestParserTest extends TestCase
         self::assertSame($query, $params->query);
     }
 
-    /**
-     * @return iterable<array{string}>
-     */
+    /** @return iterable<array{string}> */
     public static function jsonLikeContentTypes(): iterable
     {
         yield ['application/json'];
@@ -53,9 +49,7 @@ final class RequestParserTest extends TestCase
         yield ['application/json;charset=UTF-8'];
     }
 
-    /**
-     * @dataProvider graphQLContentTypes
-     */
+    /** @dataProvider graphQLContentTypes */
     public function testPostWithQueryApplicationGraphQL(string $contentType): void
     {
         $query = /** @lang GraphQL */ '{ foo }';
@@ -72,18 +66,14 @@ final class RequestParserTest extends TestCase
         self::assertSame($query, $params->query);
     }
 
-    /**
-     * @return iterable<array{string}>
-     */
+    /** @return iterable<array{string}> */
     public static function graphQLContentTypes(): iterable
     {
         yield ['application/graphql'];
         yield ['application/graphql;charset=UTF-8'];
     }
 
-    /**
-     * @dataProvider formContentTypes
-     */
+    /** @dataProvider formContentTypes */
     public function testPostWithRegularForm(string $contentType): void
     {
         $query = /** @lang GraphQL */ '{ foo }';
@@ -100,9 +90,7 @@ final class RequestParserTest extends TestCase
         self::assertSame($query, $params->query);
     }
 
-    /**
-     * @return iterable<array{string}>
-     */
+    /** @return iterable<array{string}> */
     public static function formContentTypes(): iterable
     {
         yield ['application/x-www-form-urlencoded'];
@@ -145,9 +133,7 @@ final class RequestParserTest extends TestCase
         self::assertSame($query, $params->query);
     }
 
-    /**
-     * @dataProvider nonsensicalContentTypes
-     */
+    /** @dataProvider nonsensicalContentTypes */
     public function testNonsensicalContentTypes(string $contentType): void
     {
         $request = $this->makeRequest(
@@ -163,9 +149,7 @@ final class RequestParserTest extends TestCase
         $parser->parseRequest($request);
     }
 
-    /**
-     * @return iterable<array{string}>
-     */
+    /** @return iterable<array{string}> */
     public static function nonsensicalContentTypes(): iterable
     {
         yield ['foobar'];
@@ -217,9 +201,7 @@ final class RequestParserTest extends TestCase
         $parser->parseRequest($request);
     }
 
-    /**
-     * @dataProvider multipartFormContentTypes
-     */
+    /** @dataProvider multipartFormContentTypes */
     public function testMultipartFormRequest(string $contentType): void
     {
         $file = UploadedFile::fake()->create('image.jpg', 500);
@@ -260,9 +242,7 @@ final class RequestParserTest extends TestCase
         self::assertSame($file, $variables['file']);
     }
 
-    /**
-     * @return iterable<array{string}>
-     */
+    /** @return iterable<array{string}> */
     public static function multipartFormContentTypes(): iterable
     {
         yield ['multipart/form-data'];

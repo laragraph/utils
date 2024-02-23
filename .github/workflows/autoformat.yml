@@ -18,7 +18,7 @@ jobs:
           extensions: mbstring
           php-version: 8.3
 
-      - run: composer install --no-interaction --no-progress --no-suggest
+      - run: composer install --no-interaction --no-progress
 
       - run: composer normalize
 
@@ -54,7 +54,7 @@ jobs:
           extensions: mbstring
           php-version: 7.2
 
-      - run: composer install --no-interaction --no-progress --no-suggest
+      - run: composer install --no-interaction --no-progress
 
       - run: vendor/bin/php-cs-fixer fix
 

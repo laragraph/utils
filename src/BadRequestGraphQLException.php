@@ -4,4 +4,6 @@ namespace Laragraph\Utils;
 
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class BadRequestGraphQLException extends BadRequestHttpException {}
+class BadRequestGraphQLException extends BadRequestHttpException
+{
+}

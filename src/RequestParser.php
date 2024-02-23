@@ -33,7 +33,7 @@ class RequestParser
     public function parseRequest(Request $request)
     {
         $method = $request->getMethod();
-        $bodyParams = $method === 'POST'
+        $bodyParams = 'POST' === $method
             ? $this->bodyParams($request)
             : [];
         /** @var array<string, mixed> $queryParams Laravel type is not precise enough */
@@ -100,7 +100,7 @@ class RequestParser
     protected function inlineFiles(Request $request): array
     {
         $mapParam = $request->post('map');
-        if ($mapParam === null) {
+        if (null === $mapParam) {
             throw new BadMultipartRequestGraphQLException('Missing parameter map.');
         }
         if (! is_string($mapParam)) {
@@ -109,7 +109,7 @@ class RequestParser
         }
 
         $operationsParam = $request->post('operations');
-        if ($operationsParam === null) {
+        if (null === $operationsParam) {
             throw new BadMultipartRequestGraphQLException('Missing parameter operations.');
         }
         if (! is_string($operationsParam)) {

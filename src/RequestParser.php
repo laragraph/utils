@@ -7,16 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Safe\Exceptions\JsonException;
+
 use function Safe\json_decode;
 
-/**
- * Follows https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md.
- */
+/** Follows https://github.com/graphql/graphql-over-http/blob/main/spec/GraphQLOverHTTP.md. */
 class RequestParser
 {
-    /**
-     * @var \GraphQL\Server\Helper
-     */
+    /** @var Helper */
     protected $helper;
 
     public function __construct()
@@ -28,15 +25,15 @@ class RequestParser
      * Converts an incoming HTTP request to one or more OperationParams.
      *
      * @throws \GraphQL\Server\RequestError
-     * @throws \Laragraph\Utils\BadRequestGraphQLException
-     * @throws \Laragraph\Utils\BadMultipartRequestGraphQLException
+     * @throws BadRequestGraphQLException
+     * @throws BadMultipartRequestGraphQLException
      *
      * @return \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>
      */
     public function parseRequest(Request $request)
     {
         $method = $request->getMethod();
-        $bodyParams = 'POST' === $method
+        $bodyParams = $method === 'POST'
             ? $this->bodyParams($request)
             : [];
         /** @var array<string, mixed> $queryParams Laravel type is not precise enough */
@@ -48,8 +45,8 @@ class RequestParser
     /**
      * Extracts the body parameters from the request.
      *
-     * @throws \Laragraph\Utils\BadMultipartRequestGraphQLException
-     * @throws \Laragraph\Utils\BadRequestGraphQLException
+     * @throws BadMultipartRequestGraphQLException
+     * @throws BadRequestGraphQLException
      *
      * @return array<mixed>
      */
@@ -96,14 +93,14 @@ class RequestParser
      *
      * Follows https://github.com/jaydenseric/graphql-multipart-request-spec.
      *
-     * @throws \Laragraph\Utils\BadMultipartRequestGraphQLException
+     * @throws BadMultipartRequestGraphQLException
      *
      * @return array<mixed>
      */
     protected function inlineFiles(Request $request): array
     {
         $mapParam = $request->post('map');
-        if (null === $mapParam) {
+        if ($mapParam === null) {
             throw new BadMultipartRequestGraphQLException('Missing parameter map.');
         }
         if (! is_string($mapParam)) {
@@ -112,7 +109,7 @@ class RequestParser
         }
 
         $operationsParam = $request->post('operations');
-        if (null === $operationsParam) {
+        if ($operationsParam === null) {
             throw new BadMultipartRequestGraphQLException('Missing parameter operations.');
         }
         if (! is_string($operationsParam)) {

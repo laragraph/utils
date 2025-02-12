@@ -12,7 +12,7 @@ Utilities for using GraphQL with Laravel
 
 Install through composer
 
-```bash
+```shell
 composer require laragraph/utils
 ```
 

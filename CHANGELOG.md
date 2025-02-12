@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Support Laravel 12 https://github.com/laragraph/utils/pull/20
+- Support `thecodingmachine/safe` 3 https://github.com/laragraph/utils/pull/21
 
 ## v2.1.0
 

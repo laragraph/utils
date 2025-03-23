@@ -25,7 +25,7 @@
     "ergebnis/composer-normalize": "^2.11",
     "jangregor/phpstan-prophecy": "^1",
     "mll-lab/php-cs-fixer-config": "^4",
-    "orchestra/testbench": "~3.6.0 || ~3.7.0 || ~3.8.0 || ~3.9.0 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9 || ^10 || ^10.x-dev",
+    "orchestra/testbench": "~3.6.0 || ~3.7.0 || ~3.8.0 || ~3.9.0 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9 || ^10",
     "phpstan/extension-installer": "^1",
     "phpstan/phpstan": "^1",
     "phpstan/phpstan-deprecation-rules": "^1",

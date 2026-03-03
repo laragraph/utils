@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Support Laravel 13 https://github.com/laragraph/utils/pull/22
+- Fixes error when using GET parameters on batched queries https://github.com/laragraph/utils/issues/26
 
 ## v2.2.0
 

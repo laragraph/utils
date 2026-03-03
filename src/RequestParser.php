@@ -63,7 +63,7 @@ class RequestParser
             return ['query' => $request->getContent()];
         }
 
-        $bodyParams = $request->input();
+        $bodyParams = $request->post();
 
         if (is_array($bodyParams) && count($bodyParams) > 0) {
             if (Arr::isAssoc($bodyParams)) {

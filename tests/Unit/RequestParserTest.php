@@ -119,6 +119,29 @@ final class RequestParserTest extends TestCase
         self::assertSame($barQuery, $barParams->query);
     }
 
+    public function testPostWithBatchedRequestAndGetParams(): void
+    {
+        $fooQuery = /** @lang GraphQL */ '{ foo }';
+        $barQuery = /** @lang GraphQL */ '{ bar }';
+        $request = $this->makeRequest(
+            'POST',
+            [],
+            [],
+            ['Content-Type' => 'application/json'],
+            \Safe\json_encode([
+                ['query' => $fooQuery],
+                ['query' => $barQuery],
+            ]),
+            'http://foo.bar/graphql?Operation=foo,bar'
+        );
+        $params = (new RequestParser())->parseRequest($request);
+
+        self::assertIsArray($params);
+        [$fooParams, $barParams] = $params;
+        self::assertSame($fooQuery, $fooParams->query);
+        self::assertSame($barQuery, $barParams->query);
+    }
+
     public function testPostDefaultsToRegularForm(): void
     {
         $query = /** @lang GraphQL */ '{ foo }';
@@ -502,10 +525,10 @@ final class RequestParserTest extends TestCase
      * @param  array<mixed>  $headers
      * @param  string|resource|null  $content
      */
-    private function makeRequest(string $method, array $parameters = [], array $files = [], array $headers = [], $content = null): Request
+    private function makeRequest(string $method, array $parameters = [], array $files = [], array $headers = [], $content = null, string $uri = 'http://foo.bar/graphql'): Request
     {
         $symfonyRequest = SymfonyRequest::create(
-            'http://foo.bar/graphql',
+            $uri,
             $method,
             $parameters,
             [],

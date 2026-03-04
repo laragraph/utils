@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## v2.3.1
+
+### Fixed
+
+- Ignore query parameters in non-GET requests https://github.com/laragraph/utils/issues/26
+
 ## v2.3.0
 
 ### Added

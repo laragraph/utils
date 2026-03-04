@@ -525,7 +525,7 @@ final class RequestParserTest extends TestCase
      * @param  array<mixed>  $headers
      * @param  string|resource|null  $content
      */
-    private function makeRequest(string $method, array $parameters = [], array $files = [], array $headers = [], $content = null, $uri = 'http://foo.bar/graphql'): Request
+    private function makeRequest(string $method, array $parameters = [], array $files = [], array $headers = [], $content = null, string $uri = 'http://foo.bar/graphql'): Request
     {
         $symfonyRequest = SymfonyRequest::create(
             $uri,

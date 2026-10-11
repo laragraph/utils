@@ -207,6 +207,42 @@ final class RequestParserTest extends TestCase
         $parser->parseRequest($request);
     }
 
+    public function testObjectWithNumericKeyIsNotABatch(): void
+    {
+        // A JSON object that also carries the key "0" decodes to a PHP array with the integer key 0,
+        // which webonyx takes for a batch and then fails with a TypeError on the string entries.
+        $request = $this->makeRequest(
+            'POST',
+            [],
+            [],
+            ['Content-Type' => 'application/json'],
+            '{"query":"{ foo }","0":"not an operation"}'
+        );
+        $parser = new RequestParser();
+
+        $this->expectException(BadRequestGraphQLException::class);
+        $this->expectExceptionMessage('GraphQL Server expects JSON object or array, but got: {"query":"{ foo }","0":"not an operation"}');
+
+        $parser->parseRequest($request);
+    }
+
+    public function testBatchWithNonObjectEntry(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [],
+            [],
+            ['Content-Type' => 'application/json'],
+            '[{"query":"{ foo }"},"not an operation"]'
+        );
+        $parser = new RequestParser();
+
+        $this->expectException(BadRequestGraphQLException::class);
+        $this->expectExceptionMessage('GraphQL Server expects JSON object or array, but got: [{"query":"{ foo }"},"not an operation"]');
+
+        $parser->parseRequest($request);
+    }
+
     public function testNonArrayJson(): void
     {
         $request = $this->makeRequest(

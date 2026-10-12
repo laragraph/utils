@@ -436,6 +436,70 @@ final class RequestParserTest extends TestCase
         $parser->parseRequest($request);
     }
 
+    public function testMultipartFormWithOperationsObjectWithNumericKey(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [
+                'operations' => /** @lang JSON */ '{"query":"{ foo }","0":"not an operation"}',
+                'map' => /** @lang JSON */ '{}',
+            ],
+            [],
+            [
+                'Content-Type' => 'multipart/form-data',
+            ]
+        );
+
+        $parser = new RequestParser();
+
+        $this->expectException(BadMultipartRequestGraphQLException::class);
+        $parser->parseRequest($request);
+    }
+
+    public function testMultipartFormWithBatchWithNonObjectEntry(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [
+                'operations' => /** @lang JSON */ '[{"query":"{ foo }"},"not an operation"]',
+                'map' => /** @lang JSON */ '{}',
+            ],
+            [],
+            [
+                'Content-Type' => 'multipart/form-data',
+            ]
+        );
+
+        $parser = new RequestParser();
+
+        $this->expectException(BadMultipartRequestGraphQLException::class);
+        $parser->parseRequest($request);
+    }
+
+    public function testMultipartFormWithMapToNumericKey(): void
+    {
+        $file = UploadedFile::fake()->create('image.jpg', 500);
+
+        $request = $this->makeRequest(
+            'POST',
+            [
+                'operations' => /** @lang JSON */ '{"query":"{ foo }"}',
+                'map' => /** @lang JSON */ '{"file":["0"]}',
+            ],
+            [
+                'file' => $file,
+            ],
+            [
+                'Content-Type' => 'multipart/form-data',
+            ]
+        );
+
+        $parser = new RequestParser();
+
+        $this->expectException(BadMultipartRequestGraphQLException::class);
+        $parser->parseRequest($request);
+    }
+
     public function testMultipartFormWithoutMap(): void
     {
         $request = $this->makeRequest(

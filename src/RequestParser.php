@@ -65,20 +65,8 @@ class RequestParser
 
         $bodyParams = $request->post();
 
-        if (is_array($bodyParams) && count($bodyParams) > 0) {
-            if (Arr::isAssoc($bodyParams)) {
-                return $bodyParams;
-            }
-
-            $allAssoc = true;
-            foreach ($bodyParams as $bodyParam) {
-                if (! is_array($bodyParam) || ! Arr::isAssoc($bodyParam)) {
-                    $allAssoc = false;
-                }
-            }
-            if ($allAssoc) {
-                return $bodyParams;
-            }
+        if (is_array($bodyParams) && count($bodyParams) > 0 && $this->isOperationOrBatch($bodyParams)) {
+            return $bodyParams;
         }
 
         if ($request->isJson()) {
@@ -158,6 +146,27 @@ class RequestParser
             }
         }
 
+        if (! $this->isOperationOrBatch($operations)) {
+            throw new BadMultipartRequestGraphQLException('Expected parameter operations to be an object or a list of objects.');
+        }
+
         return $operations;
+    }
+
+    /** @param array<mixed> $params */
+    protected function isOperationOrBatch(array $params): bool
+    {
+        // \GraphQL\Server\Helper::parseRequestParams() treats any body with a non-null key 0 as a batch
+        if (! isset($params[0]) && Arr::isAssoc($params)) {
+            return true;
+        }
+
+        foreach ($params as $operation) {
+            if (! is_array($operation) || ! Arr::isAssoc($operation)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

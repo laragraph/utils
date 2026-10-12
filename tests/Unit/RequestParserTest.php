@@ -207,6 +207,57 @@ final class RequestParserTest extends TestCase
         $parser->parseRequest($request);
     }
 
+    public function testObjectWithNumericKeyIsNotABatch(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [],
+            [],
+            ['Content-Type' => 'application/json'],
+            '{"query":"{ foo }","0":"not an operation"}'
+        );
+        $parser = new RequestParser();
+
+        $this->expectException(BadRequestGraphQLException::class);
+        $this->expectExceptionMessage('GraphQL Server expects JSON object or array, but got: {"query":"{ foo }","0":"not an operation"}');
+
+        $parser->parseRequest($request);
+    }
+
+    public function testBatchWithNonObjectEntry(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [],
+            [],
+            ['Content-Type' => 'application/json'],
+            '[{"query":"{ foo }"},"not an operation"]'
+        );
+        $parser = new RequestParser();
+
+        $this->expectException(BadRequestGraphQLException::class);
+        $this->expectExceptionMessage('GraphQL Server expects JSON object or array, but got: [{"query":"{ foo }"},"not an operation"]');
+
+        $parser->parseRequest($request);
+    }
+
+    public function testBatchStartingWithNull(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [],
+            [],
+            ['Content-Type' => 'application/json'],
+            '[null]'
+        );
+        $parser = new RequestParser();
+
+        $this->expectException(BadRequestGraphQLException::class);
+        $this->expectExceptionMessage('GraphQL Server expects JSON object or array, but got: [null]');
+
+        $parser->parseRequest($request);
+    }
+
     public function testNonArrayJson(): void
     {
         $request = $this->makeRequest(
@@ -374,6 +425,70 @@ final class RequestParserTest extends TestCase
                 ',
             ],
             [],
+            [
+                'Content-Type' => 'multipart/form-data',
+            ]
+        );
+
+        $parser = new RequestParser();
+
+        $this->expectException(BadMultipartRequestGraphQLException::class);
+        $parser->parseRequest($request);
+    }
+
+    public function testMultipartFormWithOperationsObjectWithNumericKey(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [
+                'operations' => /** @lang JSON */ '{"query":"{ foo }","0":"not an operation"}',
+                'map' => /** @lang JSON */ '{}',
+            ],
+            [],
+            [
+                'Content-Type' => 'multipart/form-data',
+            ]
+        );
+
+        $parser = new RequestParser();
+
+        $this->expectException(BadMultipartRequestGraphQLException::class);
+        $parser->parseRequest($request);
+    }
+
+    public function testMultipartFormWithBatchWithNonObjectEntry(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [
+                'operations' => /** @lang JSON */ '[{"query":"{ foo }"},"not an operation"]',
+                'map' => /** @lang JSON */ '{}',
+            ],
+            [],
+            [
+                'Content-Type' => 'multipart/form-data',
+            ]
+        );
+
+        $parser = new RequestParser();
+
+        $this->expectException(BadMultipartRequestGraphQLException::class);
+        $parser->parseRequest($request);
+    }
+
+    public function testMultipartFormWithMapToNumericKey(): void
+    {
+        $file = UploadedFile::fake()->create('image.jpg', 500);
+
+        $request = $this->makeRequest(
+            'POST',
+            [
+                'operations' => /** @lang JSON */ '{"query":"{ foo }"}',
+                'map' => /** @lang JSON */ '{"file":["0"]}',
+            ],
+            [
+                'file' => $file,
+            ],
             [
                 'Content-Type' => 'multipart/form-data',
             ]

@@ -243,6 +243,23 @@ final class RequestParserTest extends TestCase
         $parser->parseRequest($request);
     }
 
+    public function testBatchStartingWithNull(): void
+    {
+        $request = $this->makeRequest(
+            'POST',
+            [],
+            [],
+            ['Content-Type' => 'application/json'],
+            '[null]'
+        );
+        $parser = new RequestParser();
+
+        $this->expectException(BadRequestGraphQLException::class);
+        $this->expectExceptionMessage('GraphQL Server expects JSON object or array, but got: [null]');
+
+        $parser->parseRequest($request);
+    }
+
     public function testNonArrayJson(): void
     {
         $request = $this->makeRequest(

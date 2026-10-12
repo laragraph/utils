@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Reject JSON objects that carry the key `0` and malformed multipart `operations` instead of passing them to webonyx as a batch, where they caused a `TypeError`
+- Reject JSON and multipart bodies that webonyx parses as a batch with non-object entries, such as `{"query":"…","0":"x"}`, instead of letting them cause a `TypeError`
 
 ## v2.3.1
 

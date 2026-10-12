@@ -156,7 +156,7 @@ class RequestParser
     /** @param array<mixed> $params */
     protected function isOperationOrBatch(array $params): bool
     {
-        // \GraphQL\Server\Helper::parseRequestParams() treats any body with the key 0 as a batch
+        // \GraphQL\Server\Helper::parseRequestParams() treats any body with a non-null key 0 as a batch
         if (! isset($params[0]) && Arr::isAssoc($params)) {
             return true;
         }

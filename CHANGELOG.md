@@ -9,9 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## v2.3.2
+
 ### Fixed
 
-- Reject JSON and multipart bodies that webonyx parses as a batch with non-object entries, such as `{"query":"…","0":"x"}`, instead of letting them cause a `TypeError`
+- Reject JSON and multipart bodies that webonyx parses as a batch with non-object entries, such as `{"query":"…","0":"x"}`, instead of letting them cause a `TypeError` https://github.com/laragraph/utils/pull/27
 
 ## v2.3.1
 

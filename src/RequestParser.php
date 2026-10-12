@@ -66,9 +66,7 @@ class RequestParser
         $bodyParams = $request->post();
 
         if (is_array($bodyParams) && count($bodyParams) > 0) {
-            // Mirror \GraphQL\Server\Helper::parseRequestParams(), which treats
-            // any body with the key 0 as a batch - including a JSON object such as
-            // {"query": "...", "0": "..."}, where Arr::isAssoc() would say otherwise.
+            // \GraphQL\Server\Helper::parseRequestParams() treats any body with the key 0 as a batch
             if (! isset($bodyParams[0]) && Arr::isAssoc($bodyParams)) {
                 return $bodyParams;
             }

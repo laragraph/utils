@@ -209,8 +209,6 @@ final class RequestParserTest extends TestCase
 
     public function testObjectWithNumericKeyIsNotABatch(): void
     {
-        // A JSON object that also carries the key "0" decodes to a PHP array with the integer key 0,
-        // which webonyx takes for a batch and then fails with a TypeError on the string entries.
         $request = $this->makeRequest(
             'POST',
             [],

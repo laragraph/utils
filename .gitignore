@@ -3,3 +3,4 @@
 /.php-cs-fixer.cache
 /composer.lock
 /.idea
+node_modules

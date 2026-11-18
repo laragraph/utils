@@ -56,8 +56,10 @@
       "kylekatarnls/update-helper": true,
       "phpstan/extension-installer": true
     },
-    "audit": {
-      "block-insecure": false
+    "policy": {
+      "advisories": {
+        "block": false
+      }
     },
     "preferred-install": "dist",
     "sort-packages": true
